@@ -8,7 +8,7 @@ judged from behaviour evidence. The verdict is one of `SYBIL`, `HUMAN`,
 
 | Verdict | Airdrop weight (stored, scaled x1,000,000) | Hunter reward |
 | --- | --- | --- |
-| `SYBIL` | `0` | hunter may claim 500 mGEN (simulated) from the reward pool, once per case |
+| `SYBIL` | `0` | hunter may claim a fixed 5 GEN reward credit from the funding pool, once per case, then withdraw it |
 | `HUMAN` | `1000000` (1.0) | none |
 | `UNCERTAIN` | `500000` (0.5) | none |
 
@@ -16,11 +16,17 @@ Weights are stored as scaled integers. Only the three values above can
 ever be stored: the weight is produced by a fixed mapping from the
 verdict, never by arithmetic on a score.
 
+All money is real testnet GEN on Stable Studionet (free from the faucet,
+zero cash cost; 1 GEN = 10^18 wei). There is no demo ledger: the reward
+pool is filled with real GEN by `deposit_funding`, the hunter reward is
+a real GEN credit, and the challenge stake is real GEN.
+
 ## How the verdict is produced
 
-1. A hunter submits a case: a target address and an `https://` URL
-   pointing at behaviour evidence (prose: an analyst note or an
-   explorer-derived behaviour report).
+1. Anyone funds the reward pool with real GEN via `deposit_funding`
+   (payable). A hunter submits a case for free: a target address and an
+   `https://` URL pointing at behaviour evidence (prose: an analyst note
+   or an explorer-derived behaviour report).
 2. An evaluation is triggered by anyone except the hunter. The leader and
    every validator independently fetch the same evidence URL and ask an
    LLM to map the prose onto a fixed vocabulary of 8 signal codes:
@@ -35,7 +41,7 @@ verdict, never by arithmetic on a score.
 3. The verdict is a pure deterministic function of the signal set:
 
    - `SYBIL` iff at least 3 sybil signals and 0 human signals
-   - `HUMAN` iff at least 2 human signals and 0 sybil signals
+   - `HUMAN` iff at least 2 human signals and no sybil signal
    - `UNCERTAIN` otherwise
 
    Thin evidence (a single signal of either kind) is `UNCERTAIN`, never
@@ -58,8 +64,8 @@ The spread in the stored weight is exactly 0 — not 2%, not half a step,
 exactly 0.
 
 The only failure mode is liveness: if the judges disagree, no consensus
-is reached, nothing is stored, and the case stays `EVALUATING` for a
-retry. A wrong value is never stored.
+is reached, nothing is stored, and the case stays `EVIDENCE_REVIEW` for
+a retry. A wrong value is never stored.
 
 Edge table (every boundary, not only the happy path):
 
@@ -80,37 +86,80 @@ All 256 signal subsets were enumerated in the local mock tests
 one of the three weights, and the exact-set equivalence property holds
 for all of them.
 
+## Case lifecycle
+
+`OPEN` -> `EVIDENCE_REVIEW` -> `VERDICT_SYBIL` / `VERDICT_HUMAN` /
+`VERDICT_UNCERTAIN` -> `REWARD_PAID` / `CLOSED_NO_REWARD`.
+
+- `submit_case` creates the case as `OPEN`.
+- The first `evaluate_case` stores the pending verdict and moves the
+  case to `EVIDENCE_REVIEW`.
+- `finalize_case` (permissionless, once a pending verdict exists and no
+  challenge is open) moves the case to `VERDICT_SYBIL`, `VERDICT_HUMAN`
+  or `VERDICT_UNCERTAIN` and writes the weight.
+- A `VERDICT_SYBIL` case moves to `REWARD_PAID` when the hunter claims
+  the 5 GEN reward credit with `claim_case_reward`.
+- A `VERDICT_HUMAN` or `VERDICT_UNCERTAIN` case moves to
+  `CLOSED_NO_REWARD` with `close_case`. No reward is paid for these.
+- A decided verdict is immutable: evaluating, challenging, finalizing,
+  claiming or closing it again is rejected.
+
 ## Challenge and finality
 
-- While a case is `EVALUATING` (a pending verdict exists, not yet
+- While a case is `EVIDENCE_REVIEW` (a pending verdict exists, not yet
   finalized), anyone except the hunter may challenge with an alternative
-  signal set. The claimed signals must map to the claimed verdict under
-  the same deterministic rules, and must differ from the pending result.
+  signal set, staking exactly 3 GEN (`challenge_case` is payable and
+  rejects any other amount). The claimed signals must map to the claimed
+  verdict under the same deterministic rules, and must differ from the
+  pending result. Opening a challenge also requires the funding pool to
+  hold at least 2 GEN, and immediately reserves that 2 GEN from the
+  pool, so a successful challenge can always be paid even if the pool is
+  drawn down before the second evaluation.
 - A second evaluation then runs and finalizes directly. If the second
-  verdict equals the first, the challenge fails and the challenger loses
-  5 reputation. If it differs, the first pending verdict and its signals
-  are appended to the case witness list and the second verdict is
-  finalized. Across rounds there is still exactly one stored weight at
-  any time; the superseded pending verdict survives only as a witness.
+  verdict equals the first, the challenge fails: the 3 GEN stake and the
+  2 GEN reservation both go into the funding pool, and the challenger
+  gets nothing. If it differs, the first pending verdict and its signals
+  are appended to the case witness list as a `CONTRADICTION` witness,
+  the challenger is credited the 3 GEN stake back plus a 2 GEN reward
+  (5 GEN total, withdrawable), and the second verdict is finalized.
+  Across rounds there is still exactly one stored weight at any time;
+  the superseded pending verdict survives only as a witness.
 - `finalize_case` is permissionless and may be called by anyone once a
-  pending verdict exists and no challenge is open. A `FINALIZED` verdict
-  is immutable: evaluating, challenging, or finalizing it again is
-  rejected.
+  pending verdict exists and no challenge is open.
 - A hunter may not judge their own case: `evaluate_case` and
   `challenge_case` reject the case hunter as caller.
 
-## Reputation and rewards
+## Rewards, stakes, and the GEN ledger
 
-- Reputation starts at 100 on first participation (submitting a case or
-  challenging one). A failed challenge costs 5 reputation (floor 0); a
-  successful challenge (second verdict differs) gains 5.
-- `claim_demo_funds` credits 10000 simulated mGEN once per address.
-  The hunter reward is a fixed 500 simulated mGEN per finalized `SYBIL`
-  case, paid from a reward pool seeded at 100000 simulated mGEN at
-  deployment, once per case per hunter. If the pool is empty, the claim
-  fails. All balances are ledger entries inside this contract only.
-- The leaderboard ranks hunters by rewards earned, then by finalized
-  sybil cases, then by address.
+- The funding pool starts empty at deployment. It is filled only by
+  `deposit_funding` (payable, any amount of GEN above zero). The
+  deployment in `evidence.json` funded it with 100 GEN.
+- A hunter whose case finalizes as `SYBIL` may claim a fixed 5 GEN
+  reward credit with `claim_case_reward`, once per case, from the
+  funding pool. If the pool holds less than 5 GEN at claim time, the
+  claim fails and the case stays `VERDICT_SYBIL` until the pool is
+  topped up; the verdict itself is unaffected.
+- All GEN movement is pull-payment. Finalization and claims only record
+  a credit (wei integer). The beneficiary withdraws it themselves with
+  `withdraw_reward`, which zeroes the credit BEFORE transferring, so a
+  failed or re-entered transfer can never pay twice. No GEN is ever
+  pushed to an address during finalization.
+- Ledger invariant (checked by the `get_ledger` view):
+
+  `total_received == total_paid_out + funding_pool + challenge_reserved
+  + open_stakes + reward_credits`
+
+  and the contract balance equals `total_received - total_paid_out`.
+  `total_received` counts every GEN that entered (funding deposits and
+  challenge stakes); `total_paid_out` counts every GEN that left via
+  `withdraw_reward`. The live run reconciles this in `evidence.json`.
+
+- Hunter evolution is tracked per address as `cases_submitted`,
+  `sybil_finalized`, `rewards_earned_wei`, plus `challenges_won`,
+  `challenges_lost` and `challenge_rewards_earned_wei`. The leaderboard
+  ranks by total rewards earned (hunter rewards + challenge rewards),
+  then by finalized sybil cases, then by address. There is no generic
+  reputation score.
 
 ## Failure behaviour
 
@@ -120,8 +169,12 @@ for all of them.
 - An LLM answer outside the fixed vocabulary, or a verdict that does not
   match its signal set under the deterministic rules, is rejected the
   same way.
+- A challenge with the wrong stake amount, a challenge while the pool
+  cannot cover the success reward, a reward claim while the pool is
+  short, and a withdrawal with no credit all raise before any state is
+  written.
 - No floats cross the nondet boundary: signals are strings, the verdict
-  is a string, the evidence binding is a hex string, and weights are
-  integers. Hashing uses a pure-Python SHA-256 implemented in the
-  contract, verified against the standard library on test vectors in the
-  local mock tests.
+  is a string, the evidence binding is a hex string, and weights and GEN
+  amounts are integers (wei). Hashing uses a pure-Python SHA-256
+  implemented in the contract, verified against the standard library on
+  test vectors in the local mock tests.

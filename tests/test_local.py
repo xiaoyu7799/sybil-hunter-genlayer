@@ -1,10 +1,11 @@
-"""Local mock tests for Sybil Hunter — MOCK ONLY, not on-chain results.
+"""Local mock tests for Sybil Hunter v0.2.0 — MOCK ONLY, not on-chain results.
 
 Runs the contract's pure deterministic logic (verdict mapping, weights,
-signal parsing, pure-Python SHA-256) in plain Python with the GenLayer
-runtime stubbed out. No network, no consensus, no chain state. The
-on-chain flow is scripts/flow.mjs; its results are recorded separately
-in evidence.json / docs/live-verification.md.
+signal parsing, pure-Python SHA-256, GEN economics constants and the
+ledger bucket moves) in plain Python with the GenLayer runtime stubbed
+out. No network, no consensus, no chain state. The on-chain flow is
+scripts/flow.mjs; its results are recorded separately in evidence.json /
+docs/live-verification.md.
 
 Run: python3 tests/test_local.py
 """
@@ -23,10 +24,17 @@ class _Contract:
     pass
 
 
-class _Public:
-    @staticmethod
-    def write(fn):
+class _WriteDeco:
+    def __call__(self, fn):
         return fn
+
+    @staticmethod
+    def payable(fn):
+        return fn
+
+
+class _Public:
+    write = _WriteDeco()
 
     @staticmethod
     def view(fn):
@@ -35,11 +43,29 @@ class _Public:
 
 class _Message:
     sender_address = None
+    value = 0
 
 
 class _VM:
     class UserError(Exception):
         pass
+
+    class Return:
+        pass
+
+    @staticmethod
+    def run_nondet_unsafe(judge, validate):
+        raise NotImplementedError("nondet not available in mock")
+
+
+class _Evm:
+    @staticmethod
+    def contract_interface(cls):
+        return cls
+
+
+def _Address(addr):
+    return addr
 
 
 genlayer.Contract = _Contract
@@ -49,15 +75,19 @@ genlayer.vm = _VM()
 genlayer.u256 = int
 genlayer.TreeMap = dict
 genlayer.DynArray = list
+genlayer.Address = _Address
+genlayer.evm = _Evm()
 # The contract uses the `gl.` prefix after `from genlayer import *`,
 # so the stub must export a `gl` namespace carrying the same API.
 genlayer.gl = types.SimpleNamespace(
     Contract=_Contract, public=_Public(), message=_Message(), vm=_VM(),
     nondet=types.SimpleNamespace(), eq_principle=types.SimpleNamespace(),
+    evm=_Evm(),
 )
 sys.modules["genlayer"] = genlayer
 # `from genlayer import *` needs these names exported.
-genlayer.__all__ = ["gl", "Contract", "public", "message", "vm", "u256", "TreeMap", "DynArray"]
+genlayer.__all__ = ["gl", "Contract", "public", "message", "vm", "u256",
+                    "TreeMap", "DynArray", "Address", "evm"]
 
 ROOT = Path(__file__).resolve().parent.parent
 src = (ROOT / "contracts" / "sybil_hunter.py").read_text()
@@ -72,6 +102,10 @@ sha = ns["pure_sha256_hex"]
 SYBIL = ns["SYBIL_SIGNALS"]
 HUMAN = ns["HUMAN_SIGNALS"]
 ALL = ns["ALL_SIGNALS"]
+GEN = ns["GEN_WEI"]
+HUNTER_REWARD = ns["HUNTER_REWARD_WEI"]
+CHALLENGE_STAKE = ns["CHALLENGE_STAKE_WEI"]
+CHALLENGE_SUCCESS_REWARD = ns["CHALLENGE_SUCCESS_REWARD_WEI"]
 
 passed = 0
 
@@ -150,9 +184,81 @@ check("short address rejected", not is_hex("0x1234"))
 check("non-hex rejected", not is_hex("0x" + "zz" * 20))
 check("missing 0x rejected", not is_hex("ab" * 20))
 
-# 9. Evidence files in this repo map to the intended verdicts (mock check of
-#    the demo evidence wording: the stated signals must yield the verdict
-#    the flow expects).
+# 9. Real GEN economics constants (wei; 1 GEN = 10^18 wei).
+check("1 GEN == 10^18 wei", GEN == 10 ** 18)
+check("hunter reward == 5 GEN", HUNTER_REWARD == 5 * GEN)
+check("challenge stake == 3 GEN", CHALLENGE_STAKE == 3 * GEN)
+check("challenge success reward == 2 GEN", CHALLENGE_SUCCESS_REWARD == 2 * GEN)
+check("stake + success reward == 5 GEN credit on success",
+      CHALLENGE_STAKE + CHALLENGE_SUCCESS_REWARD == 5 * GEN)
+
+# 10. Ledger invariant simulation, replicating the contract's bucket moves
+#     exactly: total_received == total_paid_out + funding_pool + reserved
+#     + open_stakes + reward_credits, at every step.
+ledger = {"received": 0, "paid": 0, "pool": 0, "reserved": 0, "stakes": 0, "credits": 0}
+
+
+def inv(lbl):
+    check("invariant holds: " + lbl,
+          ledger["received"] == ledger["paid"] + ledger["pool"] + ledger["reserved"]
+          + ledger["stakes"] + ledger["credits"])
+
+
+# Fund 100 GEN.
+ledger["received"] += 100 * GEN
+ledger["pool"] += 100 * GEN
+inv("after funding 100 GEN")
+# Challenge 1 opens: stake 3 GEN in, 2 GEN reserved from pool.
+ledger["received"] += 3 * GEN
+ledger["stakes"] += 3 * GEN
+ledger["pool"] -= 2 * GEN
+ledger["reserved"] += 2 * GEN
+inv("after challenge 1 opens")
+# Challenge 1 fails: stake + reservation both into the pool.
+ledger["pool"] += 3 * GEN + 2 * GEN
+ledger["stakes"] -= 3 * GEN
+ledger["reserved"] -= 2 * GEN
+inv("after challenge 1 fails")
+check("pool is 103 GEN after failed challenge forfeit", ledger["pool"] == 103 * GEN)
+# Challenge 2 opens, then succeeds: challenger credited 3 + 2 GEN.
+ledger["received"] += 3 * GEN
+ledger["stakes"] += 3 * GEN
+ledger["pool"] -= 2 * GEN
+ledger["reserved"] += 2 * GEN
+inv("after challenge 2 opens")
+ledger["credits"] += 3 * GEN + 2 * GEN
+ledger["stakes"] -= 3 * GEN
+ledger["reserved"] -= 2 * GEN
+inv("after challenge 2 succeeds")
+# Hunter claims a SYBIL reward: 5 GEN pool -> credit.
+ledger["pool"] -= 5 * GEN
+ledger["credits"] += 5 * GEN
+inv("after hunter reward claim")
+# Both beneficiaries withdraw everything.
+ledger["credits"] -= 10 * GEN
+ledger["paid"] += 10 * GEN
+inv("after both withdrawals")
+check("final pool is 96 GEN (100 + 3 forfeit - 2 success reward - 5 hunter reward)",
+      ledger["pool"] == 96 * GEN)
+check("final paid out is 10 GEN", ledger["paid"] == 10 * GEN)
+check("final credits are 0", ledger["credits"] == 0)
+
+# 11. Pool-exhaustion guard, same rule as the contract: a hunter reward
+#     claim needs pool >= 5 GEN; a challenge needs pool >= 2 GEN at open.
+check("claim blocked when pool is 4 GEN", not (4 * GEN >= HUNTER_REWARD))
+check("claim allowed when pool is 5 GEN", 5 * GEN >= HUNTER_REWARD)
+check("challenge blocked when pool is 1 GEN", not (1 * GEN >= CHALLENGE_SUCCESS_REWARD))
+check("challenge allowed when pool is 2 GEN", 2 * GEN >= CHALLENGE_SUCCESS_REWARD)
+# Reservation makes the success reward safe even if the pool is drawn down
+# afterwards: reserve 2 GEN at open, pool 2 GEN -> 0, success still pays
+# from the reservation, never from the (now empty) pool.
+pool = 2 * GEN
+pool -= CHALLENGE_SUCCESS_REWARD  # reservation at challenge open
+check("reservation leaves pool 0 but reward is covered", pool == 0)
+
+# 12. Evidence files in this repo map to the intended verdicts (mock check
+#     of the demo evidence wording: the stated signals must yield the
+#     verdict the flow expects).
 for fname, expected in [("case-sybil-evidence.json", "SYBIL"),
                         ("case-human-evidence.json", "HUMAN"),
                         ("case-thin-evidence.json", "UNCERTAIN")]:
@@ -160,5 +266,20 @@ for fname, expected in [("case-sybil-evidence.json", "SYBIL"),
     stated = sorted(doc["signals_stated"])
     check("%s stated signals -> %s" % (fname, expected),
           verdict_for(stated) == expected and all(c in ALL for c in stated))
+
+# 13. Borderline evidence is genuinely two-sided: the two strong signals
+#     alone give UNCERTAIN, adding the ambiguous SAME_FUNDER gives SYBIL,
+#     so the two evaluations can honestly disagree and a challenge can
+#     succeed on either side.
+for fname in ["case-borderline-a-evidence.json", "case-borderline-b-evidence.json"]:
+    doc = json.loads((ROOT / "evidence" / fname).read_text())
+    strong = sorted(doc["signals_stated_strong"])
+    check("%s strong signals alone -> UNCERTAIN" % fname,
+          verdict_for(strong) == "UNCERTAIN")
+    with_ambig = sorted(strong + doc["signals_ambiguous"])
+    check("%s strong + ambiguous -> SYBIL" % fname,
+          verdict_for(with_ambig) == "SYBIL")
+    check("%s ambiguous code is a real signal code" % fname,
+          all(c in ALL for c in doc["signals_ambiguous"]))
 
 print("\n%d mock checks passed (LOCAL MOCK ONLY — not on-chain evidence)." % passed)

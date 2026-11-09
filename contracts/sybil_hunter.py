@@ -1,16 +1,20 @@
-# v0.1.0
+# v0.2.0
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 
 # contracts/sybil_hunter.py
 # GenLayer Intelligent Contract: Sybil Hunter — airdrop sybil scoring primitive.
 # Target Network: GenLayer Stable Studionet (Chain ID 61999, RPC https://studio.genlayer.com/api)
-# Note: reward balances are nominal mGEN accounting units inside this contract only.
-# They are not real GEN, not a token distribution, and no real funds ever move.
+#
+# Real testnet GEN economics (Studionet GEN is free from the faucet, zero
+# cash cost; 1 GEN = 10^18 wei). There is no demo ledger and no free
+# funds: the reward pool is filled with real GEN by deposit_funding, the
+# hunter reward is a real GEN credit, and the challenge stake is real GEN.
 #
 # What this contract does
 # -----------------------
-# 1. Anyone submits a case: a target address plus a URL pointing at
-#    behaviour evidence (an analyst note, explorer-derived behaviour
+# 1. Anyone funds the reward pool with real GEN: deposit_funding (payable).
+#    Hunters submit cases for free: a target address plus a URL pointing
+#    at behaviour evidence (an analyst note, explorer-derived behaviour
 #    report, or similar prose evidence).
 # 2. Anyone except the case hunter triggers an evaluation. The leader and
 #    every validator independently fetch the same evidence URL and ask an
@@ -26,20 +30,33 @@
 #    output that differs by even one signal code is rejected. Two
 #    validator-compatible outputs therefore cannot store different
 #    weights: the spread in the stored weight is exactly 0. If the
-#    judges disagree, nothing is stored and the case stays EVALUATING.
-# 4. While EVALUATING (before finalize), anyone except the hunter may
-#    challenge with an alternative signal set. A second evaluation then
-#    runs and finalizes directly. If the second verdict equals the first,
-#    the challenge fails and the challenger loses 5 reputation. If it
-#    differs, the first pending verdict is kept as a witness and the
-#    second verdict is finalized. A FINALIZED verdict is never changed.
+#    judges disagree, nothing is stored and the case stays EVIDENCE_REVIEW.
+# 4. While EVIDENCE_REVIEW (before finalize), anyone except the hunter may
+#    challenge with an alternative signal set, staking 3 GEN. A second
+#    evaluation then runs and finalizes directly. If the second verdict
+#    equals the first, the challenge fails and the 3 GEN stake is
+#    forfeited into the funding pool. If it differs, the first pending
+#    verdict is kept as a CONTRADICTION witness, the challenger is
+#    refunded the 3 GEN stake plus a 2 GEN reward (credited, withdrawable),
+#    and the second verdict is finalized. A finalized verdict is never
+#    changed.
 # 5. Finalizing writes the airdrop weight: SYBIL -> 0, UNCERTAIN -> 500000
 #    (0.5 scaled by 1,000,000), HUMAN -> 1000000 (1.0). No other weight
 #    can ever be stored. A hunter whose case finalizes as SYBIL may claim
-#    a fixed 500 mGEN reward from the simulated reward pool, once per case.
-# 6. Reputation starts at 100 on first participation (submit or
-#    challenge). claim_demo_funds credits 10000 simulated mGEN once per
-#    address so callers can hold a ledger balance.
+#    a fixed 5 GEN reward credit from the funding pool (once per case),
+#    then withdraw it to their own address with withdraw_reward.
+#    HUMAN and UNCERTAIN cases close with no reward.
+# 6. All GEN movement is pull-payment: finalization only records a credit
+#    (wei integer); the beneficiary withdraws it themselves with
+#    withdraw_reward, which zeroes the credit before transferring. The
+#    ledger invariant is:
+#      total_received == total_paid_out + funding_pool + challenge_reserved
+#                         + open_stakes + reward_credits
+#    and the contract balance equals total_received - total_paid_out.
+# 7. Case lifecycle: OPEN -> EVIDENCE_REVIEW -> VERDICT_SYBIL /
+#    VERDICT_HUMAN / VERDICT_UNCERTAIN -> REWARD_PAID / CLOSED_NO_REWARD.
+#    Hunter evolution is tracked as cases_submitted / sybil_finalized /
+#    rewards_earned (wei), plus challenge wins and losses.
 
 import json
 
@@ -115,12 +132,11 @@ WEIGHT_UNCERTAIN = 500000
 WEIGHT_HUMAN = 1000000
 WEIGHT_SCALE = 1000000
 
-HUNTER_REWARD = 500
-REWARD_POOL_INITIAL = 100000
-FAUCET_AMOUNT = 10000
-REPUTATION_START = 100
-CHALLENGE_PENALTY = 5
-CHALLENGE_REWARD = 5
+# Real GEN economics, in wei (1 GEN = 10^18 wei).
+GEN_WEI = 10 ** 18
+HUNTER_REWARD_WEI = 5 * GEN_WEI
+CHALLENGE_STAKE_WEI = 3 * GEN_WEI
+CHALLENGE_SUCCESS_REWARD_WEI = 2 * GEN_WEI
 
 
 def _verdict_for(signals) -> str:
@@ -172,22 +188,31 @@ def _parse_signals_csv(csv: str):
     return out
 
 
+@gl.evm.contract_interface
+class _Recipient:
+    class View:
+        pass
+
+    class Write:
+        pass
+
+
 class SybilHunter(gl.Contract):
     state_json: str
 
     def __init__(self):
         state = {
             "next_case_id": 0,
-            "reward_pool": REWARD_POOL_INITIAL,
-            "hunter_reward": HUNTER_REWARD,
-            "faucet_amount": FAUCET_AMOUNT,
+            "funding_pool_wei": 0,
+            "total_received_wei": 0,
+            "total_paid_out_wei": 0,
+            "hunter_reward_wei": HUNTER_REWARD_WEI,
+            "challenge_stake_wei": CHALLENGE_STAKE_WEI,
+            "challenge_success_reward_wei": CHALLENGE_SUCCESS_REWARD_WEI,
             "cases": {},
             "case_order": [],
             "weights": {},
-            "balances": {},
-            "reputation": {},
-            "faucet_claimed": {},
-            "reward_claimed": {},
+            "reward_credits": {},
             "hunter_stats": {},
         }
         self.state_json = json.dumps(state)
@@ -203,11 +228,16 @@ class SybilHunter(gl.Contract):
     def _sender(self) -> str:
         return gl.message.sender_address.as_hex.lower()
 
-    def _ensure_participant(self, state, addr: str):
-        if addr not in state["reputation"]:
-            state["reputation"][addr] = REPUTATION_START
+    def _ensure_hunter_stats(self, state, addr: str):
         if addr not in state["hunter_stats"]:
-            state["hunter_stats"][addr] = {"cases_submitted": 0, "sybil_finalized": 0, "rewards_earned": 0}
+            state["hunter_stats"][addr] = {
+                "cases_submitted": 0,
+                "sybil_finalized": 0,
+                "rewards_earned_wei": 0,
+                "challenges_won": 0,
+                "challenges_lost": 0,
+                "challenge_rewards_earned_wei": 0,
+            }
 
     def _load_case(self, state, case_id: u256):
         key = str(int(case_id))
@@ -219,7 +249,7 @@ class SybilHunter(gl.Contract):
         case["final_verdict"] = verdict
         case["final_signals"] = list(signals)
         case["final_weight_scaled"] = _weight_for(verdict)
-        case["status"] = "FINALIZED"
+        case["status"] = "VERDICT_" + verdict
         target = case["target_address"].lower()
         state["weights"][target] = {
             "weight_scaled": _weight_for(verdict),
@@ -227,14 +257,29 @@ class SybilHunter(gl.Contract):
             "case_id": int(case["case_id"]),
         }
         hunter = case["hunter"]
-        stats = state["hunter_stats"].get(hunter)
-        if stats is None:
-            stats = {"cases_submitted": 0, "sybil_finalized": 0, "rewards_earned": 0}
-            state["hunter_stats"][hunter] = stats
+        self._ensure_hunter_stats(state, hunter)
         if verdict == "SYBIL":
+            stats = state["hunter_stats"][hunter]
             stats["sybil_finalized"] = int(stats["sybil_finalized"]) + 1
 
     # -- writes -------------------------------------------------------------
+
+    @gl.public.write.payable
+    def deposit_funding(self) -> str:
+        value = int(gl.message.value)
+        if value == 0:
+            raise Exception("FUNDING_MUST_SEND_GEN")
+        sender = self._sender()
+        state = self._load()
+        state["total_received_wei"] = int(state["total_received_wei"]) + value
+        state["funding_pool_wei"] = int(state["funding_pool_wei"]) + value
+        self._save(state)
+        return json.dumps({
+            "funder": sender,
+            "deposited_wei": value,
+            "deposited_gen": value // GEN_WEI,
+            "funding_pool_wei": int(state["funding_pool_wei"]),
+        })
 
     @gl.public.write
     def submit_case(self, target_address: str, evidence_url: str, evidence_note: str) -> u256:
@@ -248,7 +293,7 @@ class SybilHunter(gl.Contract):
             raise Exception("EVIDENCE_NOTE_TOO_LONG")
         sender = self._sender()
         state = self._load()
-        self._ensure_participant(state, sender)
+        self._ensure_hunter_stats(state, sender)
         case_id = int(state["next_case_id"])
         state["next_case_id"] = case_id + 1
         case = {
@@ -257,7 +302,7 @@ class SybilHunter(gl.Contract):
             "hunter": sender,
             "evidence_url": evidence_url,
             "evidence_note": evidence_note,
-            "status": "SUBMITTED",
+            "status": "OPEN",
             "pending_verdict": None,
             "pending_signals": [],
             "pending_round": 0,
@@ -279,11 +324,11 @@ class SybilHunter(gl.Contract):
         sender = self._sender()
         state = self._load()
         case = self._load_case(state, case_id)
-        if case["status"] == "FINALIZED":
-            raise Exception("CASE_ALREADY_FINALIZED")
+        if case["status"] in ("VERDICT_SYBIL", "VERDICT_HUMAN", "VERDICT_UNCERTAIN", "REWARD_PAID", "CLOSED_NO_REWARD"):
+            raise Exception("CASE_ALREADY_DECIDED")
         if sender == case["hunter"]:
             raise Exception("HUNTER_MAY_NOT_JUDGE_OWN_CASE")
-        if case["status"] == "EVALUATING" and case["challenge"] is None:
+        if case["status"] == "EVIDENCE_REVIEW" and case["challenge"] is None:
             raise Exception("ALREADY_EVALUATED_USE_FINALIZE_OR_CHALLENGE")
         evidence_url = case["evidence_url"]
         challenged = case["challenge"] is not None
@@ -374,8 +419,8 @@ class SybilHunter(gl.Contract):
 
         state = self._load()
         case = self._load_case(state, case_id)
-        if case["status"] == "FINALIZED":
-            raise Exception("CASE_ALREADY_FINALIZED")
+        if case["status"] in ("VERDICT_SYBIL", "VERDICT_HUMAN", "VERDICT_UNCERTAIN", "REWARD_PAID", "CLOSED_NO_REWARD"):
+            raise Exception("CASE_ALREADY_DECIDED")
         case["evaluations"] = int(case["evaluations"]) + 1
         case["pending_round"] = int(case["pending_round"]) + 1
         if challenged:
@@ -383,12 +428,15 @@ class SybilHunter(gl.Contract):
             first_verdict = case["pending_verdict"]
             first_signals = list(case["pending_signals"])
             challenger = challenge["challenger"]
-            self._ensure_participant(state, challenger)
+            stake_wei = int(challenge["stake_wei"])
+            reserved_wei = int(challenge["reserved_wei"])
+            self._ensure_hunter_stats(state, challenger)
+            challenger_stats = state["hunter_stats"][challenger]
             if verdict == first_verdict:
-                rep = int(state["reputation"].get(challenger, REPUTATION_START)) - CHALLENGE_PENALTY
-                if rep < 0:
-                    rep = 0
-                state["reputation"][challenger] = rep
+                # Challenge failed: the 3 GEN stake and the 2 GEN reservation
+                # both go into the funding pool; no credit for the challenger.
+                state["funding_pool_wei"] = int(state["funding_pool_wei"]) + stake_wei + reserved_wei
+                challenger_stats["challenges_lost"] = int(challenger_stats["challenges_lost"]) + 1
                 case["witnesses"].append({
                     "witness_id": "wit-" + str(case_id) + "-r" + str(case["pending_round"]),
                     "round": int(case["pending_round"]),
@@ -398,11 +446,19 @@ class SybilHunter(gl.Contract):
                     "claimed_signals": list(challenge["claimed_signals"]),
                     "first_verdict": first_verdict,
                     "second_verdict": verdict,
-                    "note": "Second evaluation agreed with the first verdict; challenge failed; challenger reputation -5.",
+                    "stake_forfeited_wei": stake_wei,
+                    "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool.",
                 })
             else:
-                rep = int(state["reputation"].get(challenger, REPUTATION_START)) + CHALLENGE_REWARD
-                state["reputation"][challenger] = rep
+                # Challenge succeeded: the challenger is credited the 3 GEN
+                # stake back plus a 2 GEN reward (the reservation made at
+                # challenge time covers the reward, so the pool is never
+                # overdrawn). The first pending verdict survives as a witness.
+                credit = stake_wei + reserved_wei
+                prev = int(state["reward_credits"].get(challenger, 0))
+                state["reward_credits"][challenger] = prev + credit
+                challenger_stats["challenges_won"] = int(challenger_stats["challenges_won"]) + 1
+                challenger_stats["challenge_rewards_earned_wei"] = int(challenger_stats["challenge_rewards_earned_wei"]) + reserved_wei
                 case["witnesses"].append({
                     "witness_id": "wit-" + str(case_id) + "-r" + str(case["pending_round"]),
                     "round": int(case["pending_round"]),
@@ -413,38 +469,51 @@ class SybilHunter(gl.Contract):
                     "first_verdict": first_verdict,
                     "first_signals": first_signals,
                     "second_verdict": verdict,
-                    "note": "Second evaluation disagreed with the first pending verdict; first verdict kept as witness only.",
+                    "challenger_credit_wei": credit,
+                    "note": "Second evaluation disagreed with the first pending verdict; first verdict kept as witness only; challenger credited 3 GEN stake refund + 2 GEN reward.",
                 })
             case["challenge"] = None
             self._apply_final(state, case, verdict, signals)
         else:
             case["pending_verdict"] = verdict
             case["pending_signals"] = list(signals)
-            case["status"] = "EVALUATING"
+            case["status"] = "EVIDENCE_REVIEW"
         self._save(state)
         return json.dumps(self._load_case(self._load(), case_id))
 
-    @gl.public.write
+    @gl.public.write.payable
     def challenge_case(self, case_id: u256, claimed_signals_csv: str, claimed_verdict: str) -> str:
+        value = int(gl.message.value)
+        if value != CHALLENGE_STAKE_WEI:
+            raise Exception("CHALLENGE_STAKE_MUST_BE_3_GEN")
         sender = self._sender()
         state = self._load()
         case = self._load_case(state, case_id)
-        if case["status"] != "EVALUATING":
-            raise Exception("CHALLENGE_ONLY_WHILE_EVALUATING")
+        if case["status"] != "EVIDENCE_REVIEW":
+            raise Exception("CHALLENGE_ONLY_WHILE_EVIDENCE_REVIEW")
         if case["challenge"] is not None:
             raise Exception("CHALLENGE_ALREADY_OPEN")
         if sender == case["hunter"]:
             raise Exception("HUNTER_MAY_NOT_CHALLENGE_OWN_CASE")
+        if int(state["funding_pool_wei"]) < CHALLENGE_SUCCESS_REWARD_WEI:
+            raise Exception("FUNDING_POOL_TOO_LOW_FOR_CHALLENGE_REWARD")
         claimed_signals = _parse_signals_csv(claimed_signals_csv)
         if _verdict_for(claimed_signals) != claimed_verdict:
             raise Exception("CLAIMED_VERDICT_MISMATCH_WITH_SIGNALS")
         if claimed_verdict == case["pending_verdict"] and claimed_signals == list(case["pending_signals"]):
             raise Exception("CHALLENGE_MUST_DIFFER_FROM_PENDING")
-        self._ensure_participant(state, sender)
+        self._ensure_hunter_stats(state, sender)
+        # Reserve the 2 GEN success reward from the pool now, so a later
+        # successful challenge can always be paid even if the pool is
+        # drawn down in between. The stake itself is held in the case.
+        state["funding_pool_wei"] = int(state["funding_pool_wei"]) - CHALLENGE_SUCCESS_REWARD_WEI
+        state["total_received_wei"] = int(state["total_received_wei"]) + value
         case["challenge"] = {
             "challenger": sender,
             "claimed_signals": claimed_signals,
             "claimed_verdict": claimed_verdict,
+            "stake_wei": value,
+            "reserved_wei": CHALLENGE_SUCCESS_REWARD_WEI,
         }
         self._save(state)
         return json.dumps(self._load_case(self._load(), case_id))
@@ -453,8 +522,8 @@ class SybilHunter(gl.Contract):
     def finalize_case(self, case_id: u256) -> str:
         state = self._load()
         case = self._load_case(state, case_id)
-        if case["status"] != "EVALUATING":
-            raise Exception("FINALIZE_ONLY_WHILE_EVALUATING")
+        if case["status"] != "EVIDENCE_REVIEW":
+            raise Exception("FINALIZE_ONLY_WHILE_EVIDENCE_REVIEW")
         if case["challenge"] is not None:
             raise Exception("OPEN_CHALLENGE_MUST_BE_EVALUATED_FIRST")
         if case["pending_verdict"] is None:
@@ -464,44 +533,62 @@ class SybilHunter(gl.Contract):
         return json.dumps(self._load_case(self._load(), case_id))
 
     @gl.public.write
-    def claim_demo_funds(self) -> str:
-        sender = self._sender()
-        state = self._load()
-        if sender in state["faucet_claimed"]:
-            raise Exception("DEMO_FUNDS_ALREADY_CLAIMED")
-        state["faucet_claimed"][sender] = True
-        balance = int(state["balances"].get(sender, 0)) + FAUCET_AMOUNT
-        state["balances"][sender] = balance
-        self._save(state)
-        return json.dumps({"address": sender, "balance": balance, "unit": "mGEN (simulated)"})
-
-    @gl.public.write
-    def claim_hunter_reward(self, case_id: u256) -> str:
+    def claim_case_reward(self, case_id: u256) -> str:
         sender = self._sender()
         state = self._load()
         case = self._load_case(state, case_id)
-        if case["status"] != "FINALIZED":
-            raise Exception("REWARD_ONLY_AFTER_FINALIZED")
-        if case["final_verdict"] != "SYBIL":
-            raise Exception("REWARD_ONLY_FOR_SYBIL_VERDICT")
+        if case["status"] != "VERDICT_SYBIL":
+            raise Exception("REWARD_ONLY_FOR_VERDICT_SYBIL")
         if sender != case["hunter"]:
             raise Exception("ONLY_CASE_HUNTER_MAY_CLAIM")
-        key = str(int(case_id)) + ":" + sender
-        if key in state["reward_claimed"]:
-            raise Exception("REWARD_ALREADY_CLAIMED")
-        if int(state["reward_pool"]) < HUNTER_REWARD:
-            raise Exception("REWARD_POOL_EMPTY")
-        state["reward_pool"] = int(state["reward_pool"]) - HUNTER_REWARD
-        state["reward_claimed"][key] = True
-        balance = int(state["balances"].get(sender, 0)) + HUNTER_REWARD
-        state["balances"][sender] = balance
-        stats = state["hunter_stats"].get(sender)
-        if stats is None:
-            stats = {"cases_submitted": 0, "sybil_finalized": 0, "rewards_earned": 0}
-            state["hunter_stats"][sender] = stats
-        stats["rewards_earned"] = int(stats["rewards_earned"]) + HUNTER_REWARD
+        if int(state["funding_pool_wei"]) < HUNTER_REWARD_WEI:
+            raise Exception("FUNDING_POOL_INSUFFICIENT")
+        state["funding_pool_wei"] = int(state["funding_pool_wei"]) - HUNTER_REWARD_WEI
+        prev = int(state["reward_credits"].get(sender, 0))
+        state["reward_credits"][sender] = prev + HUNTER_REWARD_WEI
+        self._ensure_hunter_stats(state, sender)
+        stats = state["hunter_stats"][sender]
+        stats["rewards_earned_wei"] = int(stats["rewards_earned_wei"]) + HUNTER_REWARD_WEI
+        case["status"] = "REWARD_PAID"
         self._save(state)
-        return json.dumps({"hunter": sender, "case_id": int(case_id), "reward": HUNTER_REWARD, "balance": balance, "reward_pool": int(state["reward_pool"]), "unit": "mGEN (simulated)"})
+        return json.dumps({
+            "hunter": sender,
+            "case_id": int(case_id),
+            "reward_wei": HUNTER_REWARD_WEI,
+            "reward_gen": HUNTER_REWARD_WEI // GEN_WEI,
+            "credit_wei": int(state["reward_credits"][sender]),
+            "funding_pool_wei": int(state["funding_pool_wei"]),
+        })
+
+    @gl.public.write
+    def close_case(self, case_id: u256) -> str:
+        state = self._load()
+        case = self._load_case(state, case_id)
+        if case["status"] not in ("VERDICT_HUMAN", "VERDICT_UNCERTAIN"):
+            raise Exception("CLOSE_ONLY_AFTER_HUMAN_OR_UNCERTAIN_VERDICT")
+        case["status"] = "CLOSED_NO_REWARD"
+        self._save(state)
+        return json.dumps(self._load_case(self._load(), case_id))
+
+    @gl.public.write
+    def withdraw_reward(self) -> str:
+        sender = self._sender()
+        state = self._load()
+        amount = int(state["reward_credits"].get(sender, 0))
+        if amount == 0:
+            raise Exception("NO_REWARD_CREDIT")
+        # Pull payment: zero the credit BEFORE transferring, so a failed
+        # or re-entered transfer can never pay twice.
+        state["reward_credits"][sender] = 0
+        state["total_paid_out_wei"] = int(state["total_paid_out_wei"]) + amount
+        self._save(state)
+        _Recipient(Address(sender)).emit_transfer(value=u256(amount))
+        return json.dumps({
+            "beneficiary": sender,
+            "withdrawn_wei": amount,
+            "withdrawn_gen": amount // GEN_WEI,
+            "total_paid_out_wei": int(state["total_paid_out_wei"]),
+        })
 
     # -- views --------------------------------------------------------------
 
@@ -544,21 +631,70 @@ class SybilHunter(gl.Contract):
         return json.dumps(state["weights"][key])
 
     @gl.public.view
-    def get_balance(self, address: str) -> str:
+    def get_reward_credit(self, address: str) -> str:
         state = self._load()
         key = address.lower()
-        return json.dumps({"address": key, "balance": int(state["balances"].get(key, 0)), "unit": "mGEN (simulated)"})
+        return json.dumps({"address": key, "credit_wei": int(state["reward_credits"].get(key, 0))})
 
     @gl.public.view
-    def get_reputation(self, address: str) -> str:
+    def get_funding_pool(self) -> str:
+        state = self._load()
+        return json.dumps({
+            "funding_pool_wei": int(state["funding_pool_wei"]),
+            "hunter_reward_wei": HUNTER_REWARD_WEI,
+            "challenge_stake_wei": CHALLENGE_STAKE_WEI,
+            "challenge_success_reward_wei": CHALLENGE_SUCCESS_REWARD_WEI,
+        })
+
+    @gl.public.view
+    def get_hunter_stats(self, address: str) -> str:
         state = self._load()
         key = address.lower()
-        return json.dumps({"address": key, "reputation": int(state["reputation"].get(key, REPUTATION_START))})
+        self._ensure_hunter_stats(state, key)
+        stats = state["hunter_stats"][key]
+        return json.dumps({
+            "hunter": key,
+            "cases_submitted": int(stats["cases_submitted"]),
+            "sybil_finalized": int(stats["sybil_finalized"]),
+            "rewards_earned_wei": int(stats["rewards_earned_wei"]),
+            "challenges_won": int(stats["challenges_won"]),
+            "challenges_lost": int(stats["challenges_lost"]),
+            "challenge_rewards_earned_wei": int(stats["challenge_rewards_earned_wei"]),
+        })
 
     @gl.public.view
-    def get_pool(self) -> str:
+    def get_ledger(self) -> str:
         state = self._load()
-        return json.dumps({"reward_pool": int(state["reward_pool"]), "hunter_reward": HUNTER_REWARD, "unit": "mGEN (simulated)"})
+        credits_total = 0
+        for amount in state["reward_credits"].values():
+            credits_total += int(amount)
+        stakes_total = 0
+        reserved_total = 0
+        for case in state["cases"].values():
+            challenge = case.get("challenge")
+            if challenge is not None:
+                stakes_total += int(challenge["stake_wei"])
+                reserved_total += int(challenge["reserved_wei"])
+        total_received = int(state["total_received_wei"])
+        total_paid_out = int(state["total_paid_out_wei"])
+        funding_pool = int(state["funding_pool_wei"])
+        contract_balance = int(self.balance)
+        accounted = total_received - total_paid_out
+        invariant = (
+            total_received == total_paid_out + funding_pool + reserved_total + stakes_total + credits_total
+            and contract_balance == accounted
+        )
+        return json.dumps({
+            "total_received_wei": total_received,
+            "total_paid_out_wei": total_paid_out,
+            "funding_pool_wei": funding_pool,
+            "challenge_reserved_wei": reserved_total,
+            "open_stakes_wei": stakes_total,
+            "reward_credits_wei": credits_total,
+            "contract_balance_wei": contract_balance,
+            "accounted_wei": accounted,
+            "invariant_ok": invariant,
+        })
 
     @gl.public.view
     def get_leaderboard(self, limit: u256) -> str:
@@ -567,12 +703,16 @@ class SybilHunter(gl.Contract):
         state = self._load()
         rows = []
         for hunter, stats in state["hunter_stats"].items():
+            total_rewards = int(stats["rewards_earned_wei"]) + int(stats["challenge_rewards_earned_wei"])
             rows.append({
                 "hunter": hunter,
                 "cases_submitted": int(stats["cases_submitted"]),
                 "sybil_finalized": int(stats["sybil_finalized"]),
-                "rewards_earned": int(stats["rewards_earned"]),
-                "reputation": int(state["reputation"].get(hunter, REPUTATION_START)),
+                "rewards_earned_wei": int(stats["rewards_earned_wei"]),
+                "challenges_won": int(stats["challenges_won"]),
+                "challenges_lost": int(stats["challenges_lost"]),
+                "challenge_rewards_earned_wei": int(stats["challenge_rewards_earned_wei"]),
+                "total_rewards_wei": total_rewards,
             })
-        rows.sort(key=lambda r: (-r["rewards_earned"], -r["sybil_finalized"], r["hunter"]))
+        rows.sort(key=lambda r: (-r["total_rewards_wei"], -r["sybil_finalized"], r["hunter"]))
         return json.dumps(rows[:int(limit)])
