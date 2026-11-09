@@ -205,11 +205,10 @@ await expectReject(clientA, "evaluate_case", [0n], 0n, "reject: hunter evaluates
 await writeWithRetry(clientB, "evaluate_case", [0n], "evaluate_case 0 (first)");
 const case0eval1 = await read(clientB, "get_case", [0n]);
 console.log("Case 0 after first evaluation:", JSON.stringify(case0eval1));
-const claim0 = challengeClaimFor(case0eval1.pending_verdict,
-  ["BURST_ACTIVITY", "FRESH_NO_HISTORY", "IDENTICAL_TX_PATTERN", "SAME_FUNDER"], []);
-
-// --- 6. Case 0: challenge, claiming the opposite verdict, staking 3 GEN.
-await write(clientB, "challenge_case", [0n, claim0.csv, claim0.verdict], `challenge_case 0 (claim ${claim0.verdict}, 3 GEN)`, 3n * GEN);
+// --- 6. Case 0: challenge, claiming HUMAN with 2 human signals, staking 3 GEN.
+//     (The claimed signals must map to the claimed verdict: 4 sybil
+//     signals would map to SYBIL, not to UNCERTAIN.)
+await write(clientB, "challenge_case", [0n, "LONG_HISTORY,DIVERSE_COUNTERPARTIES", "HUMAN"], "challenge_case 0 (claim HUMAN, 3 GEN)", 3n * GEN);
 const case0challenged = await read(clientB, "get_case", [0n]);
 console.log("Case 0 after challenge:", JSON.stringify(case0challenged));
 
