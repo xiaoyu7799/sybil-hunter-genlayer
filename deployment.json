@@ -1,0 +1,15 @@
+{
+  "network": "Stable Studionet",
+  "chainId": 61999,
+  "rpcUrl": "https://studio.genlayer.com/api",
+  "explorer": "https://explorer-studio.genlayer.com/address/0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4",
+  "studio": "https://studio.genlayer.com/?import-contract=0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4",
+  "contractAddress": "0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4",
+  "deployTxHash": "0xf1180e36dcad5cf08b3481aaebabfa37ecae4863d8ec5df839cd94a6c832beba",
+  "deployer": "0xAEAfe8C05459dA086F1bc1CF57d40428575d0D2A",
+  "contractFile": "contracts/sybil_hunter.py",
+  "contractSha256": "0b472ecc1d5faee616aade7a9e44ae8678b246bb570dc04317fa0f3d598e0467",
+  "sourceCommit": "0831bd7e6d875aab2d954a3ef8e0fac51e3e6171",
+  "deployedAt": "2026-11-09T07:44:13.482Z",
+  "receiptStatus": "FINALIZED"
+}

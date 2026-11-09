@@ -1,0 +1,216 @@
+{
+  "network": "Stable Studionet",
+  "chainId": 61999,
+  "rpcUrl": "https://studio.genlayer.com/api",
+  "contractAddress": "0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4",
+  "explorer": "https://explorer-studio.genlayer.com/address/0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4",
+  "hunter": "0x2B311E317291323371c5F2eB531204FD0d8DD904",
+  "challenger": "0x773BF6A99db03DDECA9B60b2c300ad96e13570ac",
+  "targets": {
+    "sybil": "0x1111111111111111111111111111111111111111",
+    "human": "0x2222222222222222222222222222222222222222",
+    "thin": "0x3333333333333333333333333333333333333333"
+  },
+  "transactions": [
+    {
+      "label": "claim_demo_funds (A)",
+      "txHash": "0x058add19a146af89ec1a98fcc4ba3dc520a4315f7c1dc285ce0813a537a5767f",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 0 (sybil)",
+      "txHash": "0x9289a7a371f75f1ed6c73cfdda3ad5d821ff2e653b39e5d98fe85ae33ecca833",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 1 (human)",
+      "txHash": "0x38d8701aae148277661a745a1bd641d3bf837d183fa4c591034c092b541d0a8c",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 2 (thin)",
+      "txHash": "0x0254818cc9c892ea6552484406cfd658bef4796ea97bdd8cf47817ac66c7481f",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 0 (first) (attempt 1)",
+      "txHash": "0xa5126354ffbe88bc1d6d16cb1979c841db96a688d11b1cc8baf8c5b0a24000c4",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 0 (claim HUMAN)",
+      "txHash": "0xfd54c2ff2e78f21c0e6a320608c438ebf86b30ff897f578c64b3182e11dfbbb0",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 0 (second, finalizes) (attempt 1)",
+      "txHash": "0x7a64d07025112c92288c40d055389a2768aafe9a4e32d1744cf718a5334b63b8",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 1 (attempt 1)",
+      "txHash": "0xf88f1aec15a24f4fc236bd87a6b83b01ca59d6c03327c59d3134c2118d9ed84c",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "finalize_case 1",
+      "txHash": "0xb57caf295acc18b30864a5d079f016deb223195d868865351da04a178d2c7695",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 2 (attempt 1)",
+      "txHash": "0x11080b5349331a2a1cd4d0cf83403f7ba2a3ca8a2732ccc64ff286c5b894a30a",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "finalize_case 2",
+      "txHash": "0x477f236da7f247670a9e6fc11e331afd81e65606e4c1ddc65a0c5b870540f519",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "claim_hunter_reward 0",
+      "txHash": "0x92b69b11587744891905747a4b044a59f61bfcfb83b59b9bfb1076fed2e0ae14",
+      "status": "FINALIZED"
+    }
+  ],
+  "cases": {
+    "case0": {
+      "case_id": 0,
+      "target_address": "0x1111111111111111111111111111111111111111",
+      "hunter": "0x2b311e317291323371c5f2eb531204fd0d8dd904",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-sybil-evidence.json",
+      "evidence_note": "Cluster candidate: shared funder, identical pattern, burst, fresh.",
+      "status": "FINALIZED",
+      "pending_verdict": "SYBIL",
+      "pending_signals": [
+        "BURST_ACTIVITY",
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "SYBIL",
+      "final_signals": [
+        "BURST_ACTIVITY",
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "final_weight_scaled": 0,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-0-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x773bf6a99db03ddeca9b60b2c300ad96e13570ac",
+          "claimed_verdict": "HUMAN",
+          "claimed_signals": [
+            "DIVERSE_COUNTERPARTIES",
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "note": "Second evaluation agreed with the first verdict; challenge failed; challenger reputation -5."
+        }
+      ]
+    },
+    "case1": {
+      "case_id": 1,
+      "target_address": "0x2222222222222222222222222222222222222222",
+      "hunter": "0x2b311e317291323371c5f2eb531204fd0d8dd904",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-human-evidence.json",
+      "evidence_note": "Established user: long history, diverse counterparties.",
+      "status": "FINALIZED",
+      "pending_verdict": "HUMAN",
+      "pending_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "pending_round": 1,
+      "evaluations": 1,
+      "final_verdict": "HUMAN",
+      "final_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "final_weight_scaled": 1000000,
+      "challenge": null,
+      "witnesses": []
+    },
+    "case2": {
+      "case_id": 2,
+      "target_address": "0x3333333333333333333333333333333333333333",
+      "hunter": "0x2b311e317291323371c5f2eb531204fd0d8dd904",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-thin-evidence.json",
+      "evidence_note": "Thin evidence: burst activity only, nothing else observed.",
+      "status": "FINALIZED",
+      "pending_verdict": "UNCERTAIN",
+      "pending_signals": [
+        "BURST_ACTIVITY"
+      ],
+      "pending_round": 1,
+      "evaluations": 1,
+      "final_verdict": "UNCERTAIN",
+      "final_signals": [
+        "BURST_ACTIVITY"
+      ],
+      "final_weight_scaled": 500000,
+      "challenge": null,
+      "witnesses": []
+    }
+  },
+  "weights": {
+    "sybil": {
+      "weight_scaled": 0,
+      "verdict": "SYBIL",
+      "case_id": 0
+    },
+    "human": {
+      "weight_scaled": 1000000,
+      "verdict": "HUMAN",
+      "case_id": 1
+    },
+    "thin": {
+      "weight_scaled": 500000,
+      "verdict": "UNCERTAIN",
+      "case_id": 2
+    }
+  },
+  "balanceHunter": {
+    "address": "0x2b311e317291323371c5f2eb531204fd0d8dd904",
+    "balance": 10500,
+    "unit": "mGEN (simulated)"
+  },
+  "reputationChallenger": {
+    "address": "0x773bf6a99db03ddeca9b60b2c300ad96e13570ac",
+    "reputation": 95
+  },
+  "rewardPool": {
+    "reward_pool": 99500,
+    "hunter_reward": 500,
+    "unit": "mGEN (simulated)"
+  },
+  "leaderboard": [
+    {
+      "hunter": "0x2b311e317291323371c5f2eb531204fd0d8dd904",
+      "cases_submitted": 3,
+      "sybil_finalized": 1,
+      "rewards_earned": 500,
+      "reputation": 100
+    },
+    {
+      "hunter": "0x773bf6a99db03ddeca9b60b2c300ad96e13570ac",
+      "cases_submitted": 0,
+      "sybil_finalized": 0,
+      "rewards_earned": 0,
+      "reputation": 95
+    }
+  ],
+  "caseCount": 3,
+  "rewardClaimed": true,
+  "checkedAt": "2026-11-09T07:52:54.630Z"
+}

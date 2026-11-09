@@ -2,8 +2,8 @@
 
 Validators judge address-behaviour evidence and score airdrop sybil risk on chain: `SYBIL` / `HUMAN` / `UNCERTAIN` decide the airdrop weight (0 / 1 / 0.5) and pay the hunter a reward for a confirmed sybil.
 
-- Contract: `CONTRACT_ADDRESS_TBD`
-- Explorer: `https://explorer-studio.genlayer.com/address/CONTRACT_ADDRESS_TBD`
+- Contract: `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4`
+- Explorer: `https://explorer-studio.genlayer.com/address/0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4`
 - Network: Stable Studionet, chain 61999, RPC `https://studio.genlayer.com/api`
 
 ## How it works
