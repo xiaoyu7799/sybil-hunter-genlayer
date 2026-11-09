@@ -33,7 +33,7 @@ Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it
 - challenge_case 4 (claim SYBIL, 3 GEN): `0xef9b84355eea62869a443d927ef7680048794dbf438dcf8730a04bb072e55870` — FINALIZED
 - evaluate_case 4 (second, finalizes) (attempt 1): `0xcba41503b7b0b94e398ba0d4df7f307ff29d0344ac33b6915081ccf714ddad78` — FINALIZED
 - close_case 4 (no reward): `0xa84f977ad54ed32a2690786ee7664f2b15c0e67ebd469931a8818733f703cab1` — FINALIZED
-- submit_case 5 (borderline B): `0x88cfcbe2dcd332ba136abdddd513e1bf436a534da5d6e7458ad0594d3699ae85` — FINALIZED
+- submit_case 5 (borderline C): `0x88cfcbe2dcd332ba136abdddd513e1bf436a534da5d6e7458ad0594d3699ae85` — FINALIZED
 - evaluate_case 5 (first) (attempt 1): `0x95cd0d662321124cea6032e40787272df5a69abc7458ce40887c504daa9215f5` — FINALIZED
 - challenge_case 5 (claim UNCERTAIN, 3 GEN): `0xff84c571b88c75cda2f0ddac2a47fdfa9cb96cde30052c862de3208d3f224328` — FINALIZED
 - evaluate_case 5 (second, finalizes) (attempt 1): `0xa568ca919897fbcbd31a9a436cd9efd050cb2ee1b96524d460484f91b44a0a65` — FINALIZED
@@ -47,7 +47,7 @@ Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it
 - reject: withdraw_reward with no credit — rejected at `receipt` (tx `0x6fbf4b915cc70100751e6f1f9d110a64ace31a1f6e2ebd448e5eaef85f331f2a`)
 - reject: hunter evaluates own case — rejected at `receipt` (tx `0x8fad0e8ac277f9623a17573a7d359602757ae6773252ed391155a314277960af`)
 - reject: finalize_case with open challenge — rejected at `receipt` (tx `0x19549fe5bb97a40f68d5273633700bc70084dac79c71fc2905742e60a9e03005`)
-- reject: challenge_case with 1 GEN stake (must be 3 GEN) — rejected at `receipt-wait` (tx `0x209665ecbf0e6f53bae35b37f45a30af92374093c8cbf814ccf5544a903928c7`): Do not know how to serialize a BigInt
+- reject: challenge_case with 1 GEN stake (must be 3 GEN) — rejected at `receipt-wait` (tx `0x209665ecbf0e6f53bae35b37f45a30af92374093c8cbf814ccf5544a903928c7`): the receipt could not be parsed client-side (Do not know how to serialize a BigInt), but the call was rejected on-chain: state unchanged, and its 1 GEN stayed in the contract balance and was recovered by the sweep below
 - reject: claim_case_reward 0 twice — rejected at `receipt` (tx `0x0b616f25d429b9eac2dc7639a2592e58678c42ebbdcb5137d9bccd32b9e3aa9d`)
 - reject: withdraw_reward (B) with no credit — rejected at `receipt` (tx `0xc763a0fb6e4c3b3e75ef7e119ad724ec8afb48c0d015d8b93da3f1f06e226db6`)
 
@@ -59,17 +59,21 @@ Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it
 - Case 3: status `CLOSED_NO_REWARD`, verdict `UNCERTAIN`, signals `["BURST_ACTIVITY","IDENTICAL_TX_PATTERN"]`, weight `500000`, witnesses `1`
 - Case 4: status `CLOSED_NO_REWARD`, verdict `UNCERTAIN`, signals `["BURST_ACTIVITY","IDENTICAL_TX_PATTERN"]`, weight `500000`, witnesses `1`
 - Case 5: status `REWARD_PAID`, verdict `SYBIL`, signals `["BURST_ACTIVITY","IDENTICAL_TX_PATTERN","SAME_FUNDER"]`, weight `0`, witnesses `1`
-- Weights: {"sybil":{"weight_scaled":0,"verdict":"SYBIL","case_id":0},"human":{"weight_scaled":1000000,"verdict":"HUMAN","case_id":1},"thin":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":2},"borderA":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":3},"borderB":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":4},"borderC":{"weight_scaled":0,"verdict":"SYBIL","case_id":5}}
-- Ledger: {"total_received_wei":113000000000000000000,"total_paid_out_wei":10000000000000000000,"funding_pool_wei":103000000000000000000,"challenge_reserved_wei":0,"open_stakes_wei":0,"reward_credits_wei":0,"contract_balance_wei":103000000000000000000,"accounted_wei":103000000000000000000,"stray_wei":0,"invariant_ok":true}
-- GEN reconciliation: {"totalReceivedGen":"113","totalPaidOutGen":"10","fundingPoolGen":"103","challengeReservedGen":"0","openStakesGen":"0","rewardCreditsGen":"0","contractBalanceGen":"103","hunterWithdrawnGen":"10","challengerWithdrawnGen":"0","invariantOk":true}
-- Funding pool: {"funding_pool_wei":103000000000000000000,"hunter_reward_wei":5000000000000000000,"challenge_stake_wei":3000000000000000000,"challenge_success_reward_wei":2000000000000000000}
+- Case 6: status `CLOSED_NO_REWARD`, verdict `UNCERTAIN`, signals `["LONG_HISTORY"]`, weight `500000`, witnesses `1`
+- Weights: {"sybil":{"weight_scaled":0,"verdict":"SYBIL","case_id":0},"human":{"weight_scaled":1000000,"verdict":"HUMAN","case_id":1},"thin":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":2},"borderA":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":3},"borderB":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":4},"borderC":{"weight_scaled":0,"verdict":"SYBIL","case_id":5},"borderHuman":{"weight_scaled":500000,"verdict":"UNCERTAIN","case_id":6}}
+- Ledger: {"total_received_wei":116000000000000000000,"total_paid_out_wei":10000000000000000000,"funding_pool_wei":106000000000000000000,"challenge_reserved_wei":0,"open_stakes_wei":0,"reward_credits_wei":0,"contract_balance_wei":106000000000000000000,"accounted_wei":106000000000000000000,"stray_wei":0,"invariant_ok":true} (after case 6; before case 6 it was 113 received / 103 pool / 103 balance)
+- GEN reconciliation: {"totalReceivedGen":"116","totalPaidOutGen":"10","fundingPoolGen":"106","challengeReservedGen":"0","openStakesGen":"0","rewardCreditsGen":"0","contractBalanceGen":"106","hunterWithdrawnGen":"10","challengerWithdrawnGen":"0","invariantOk":true} (in 116 == out 10 + pool 106; in = 100 funding + 15 stakes (5 challenges x 3 GEN) + 1 swept stray)
+- Funding pool: {"funding_pool_wei":106000000000000000000,"hunter_reward_wei":5000000000000000000,"challenge_stake_wei":3000000000000000000,"challenge_success_reward_wei":2000000000000000000}
 - Hunter reward credit (after withdraw): {"address":"0xa5abe100cfadb0f2ad07c5a0b88407f985091145","credit_wei":0}
 - Challenger reward credit (after withdraw): {"address":"0xa5bc06a5ac0a6ef177a44539c8a9c723d421d2fc","credit_wei":0}
 - Hunter stats: {"hunter":"0xa5abe100cfadb0f2ad07c5a0b88407f985091145","cases_submitted":6,"sybil_finalized":2,"rewards_earned_wei":10000000000000000000,"challenges_won":0,"challenges_lost":0,"challenge_rewards_earned_wei":0}
 - Challenger stats: {"hunter":"0xa5bc06a5ac0a6ef177a44539c8a9c723d421d2fc","cases_submitted":0,"sybil_finalized":0,"rewards_earned_wei":0,"challenges_won":0,"challenges_lost":4,"challenge_rewards_earned_wei":0}
+- Case 6 hunter stats: {"hunter":"0xd9149acffa18ce935db0a4246cb4b4069058dfcd","cases_submitted":1,"sybil_finalized":0,"rewards_earned_wei":0,"challenges_won":0,"challenges_lost":0,"challenge_rewards_earned_wei":0}
+- Case 6 challenger stats: {"hunter":"0xca18ecd7bc37778ce5303a1e8d3ca776401c57d8","cases_submitted":0,"sybil_finalized":0,"rewards_earned_wei":0,"challenges_won":0,"challenges_lost":1,"challenge_rewards_earned_wei":0}
 - Leaderboard: [{"hunter":"0xa5abe100cfadb0f2ad07c5a0b88407f985091145","cases_submitted":6,"sybil_finalized":2,"rewards_earned_wei":10000000000000000000,"challenges_won":0,"challenges_lost":0,"challenge_rewards_earned_wei":0,"total_rewards_wei":10000000000000000000},{"hunter":"0xa5bc06a5ac0a6ef177a44539c8a9c723d421d2fc","cases_submitted":0,"sybil_finalized":0,"rewards_earned_wei":0,"challenges_won":0,"challenges_lost":4,"challenge_rewards_earned_wei":0,"total_rewards_wei":0}]
-- Case count: 6
-- Successful challenge on-chain: no — all three borderline attempts failed to flip; see evidence.json borderlineAttempts
+- Case count: 7
+- Successful challenge on-chain: no — all four attempts on this contract failed to flip (borderline A, B, C sybil-side + human-side case 6); two further attempts on the superseded 0xdc343813A233A43C2Db47Ee9df848e6a583C09CE contract also failed to flip, for six failed attempts in total. See evidence.json borderlineAttempts and flipAttempt6. The CONTRADICTION witness and the 3 GEN refund + 2 GEN challenger reward path are mock-tested only (tests/test_local.py, 319 checks).
+- Case 6 (separate sixth flip attempt): submit `0x045985e988fb61f779d368c6e1f00f9d999a1bdd8075b082db1cc213421edf20`, evaluate first `0xc99a8820e242d3e52f34bb848813b36c8ad02d8f35dce2cb1faf2ee90ec05b2e`, challenge `0xfc5a1ee6534c0897ee64170a68781d4a02cdaed28bb47d27e315b533f4e4d420`, evaluate second `0x5e69edec3c7c4ff62b269a60f315ff7857b10ea12939d9f4dd7df67c5eb809d7`, close `0xfc0a20c1ed169c9a94a2d3d149ec01fcf8c6df12a9b21abd6d1afcc39e7c4126` — all FINALIZED; first verdict UNCERTAIN, second UNCERTAIN, no flip; 3 GEN stake forfeited to the pool (pool 103 -> 106 GEN, total received 113 -> 116 GEN).
 - Stray GEN swept into the pool: 1 GEN (1000000000000000000 wei)
 - Hunter withdrew: true; challenger withdrew: false
 - EOA balances (wei): {"funderAfterFundWei":"10000000000000000000000","challengerAfterFundWei":"100000000000000000000","funderAfterDepositWei":"9900000000000000000000","hunterBeforeWithdrawWei":"0","challengerBeforeWithdrawWei":"87000000000000000000","hunterAfterWithdrawWei":"10000000000000000000","hunterAfterWithdrawPlus8sWei":"10000000000000000000","challengerAfterWithdrawWei":"87000000000000000000","challengerAfterWithdrawPlus8sWei":"87000000000000000000","funderFinalWei":"9900000000000000000000"}

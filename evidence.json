@@ -14,7 +14,8 @@
     "thin": "0x3333333333333333333333333333333333333333",
     "borderA": "0x4444444444444444444444444444444444444444",
     "borderB": "0x5555555555555555555555555555555555555555",
-    "borderC": "0x6666666666666666666666666666666666666666"
+    "borderC": "0x6666666666666666666666666666666666666666",
+    "borderHuman": "0x7777777777777777777777777777777777777777"
   },
   "fundingGen": 100,
   "straySweptWei": 1000000000000000000,
@@ -145,7 +146,7 @@
       "status": "FINALIZED"
     },
     {
-      "label": "submit_case 5 (borderline B)",
+      "label": "submit_case 5 (borderline C)",
       "txHash": "0x88cfcbe2dcd332ba136abdddd513e1bf436a534da5d6e7458ad0594d3699ae85",
       "status": "FINALIZED"
     },
@@ -172,6 +173,31 @@
     {
       "label": "withdraw_reward (A)",
       "txHash": "0x7031c049e81eb4109d3c591fc133c5081784062befbe731459ddf808b1a9a787",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 6 (borderline human)",
+      "txHash": "0x045985e988fb61f779d368c6e1f00f9d999a1bdd8075b082db1cc213421edf20",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 6 (first) (attempt 1)",
+      "txHash": "0xc99a8820e242d3e52f34bb848813b36c8ad02d8f35dce2cb1faf2ee90ec05b2e",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 6 (claim HUMAN, 3 GEN)",
+      "txHash": "0xfc5a1ee6534c0897ee64170a68781d4a02cdaed28bb47d27e315b533f4e4d420",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 6 (second, finalizes) (attempt 1)",
+      "txHash": "0x5e69edec3c7c4ff62b269a60f315ff7857b10ea12939d9f4dd7df67c5eb809d7",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "close_case 6 (no reward)",
+      "txHash": "0xfc0a20c1ed169c9a94a2d3d149ec01fcf8c6df12a9b21abd6d1afcc39e7c4126",
       "status": "FINALIZED"
     }
   ],
@@ -488,6 +514,43 @@
           "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
         }
       ]
+    },
+    "case6": {
+      "case_id": 6,
+      "target_address": "0x7777777777777777777777777777777777777777",
+      "hunter": "0xd9149acffa18ce935db0a4246cb4b4069058dfcd",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-borderline-human-evidence.json",
+      "evidence_note": "Borderline established user: long history, counterparties ambiguous.",
+      "status": "CLOSED_NO_REWARD",
+      "pending_verdict": "UNCERTAIN",
+      "pending_signals": [
+        "LONG_HISTORY"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "UNCERTAIN",
+      "final_signals": [
+        "LONG_HISTORY"
+      ],
+      "final_weight_scaled": 500000,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-6-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0xca18ecd7bc37778ce5303a1e8d3ca776401c57d8",
+          "claimed_verdict": "HUMAN",
+          "claimed_signals": [
+            "DIVERSE_COUNTERPARTIES",
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "UNCERTAIN",
+          "second_verdict": "UNCERTAIN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
     }
   },
   "weights": {
@@ -520,34 +583,39 @@
       "weight_scaled": 0,
       "verdict": "SYBIL",
       "case_id": 5
+    },
+    "borderHuman": {
+      "weight_scaled": 500000,
+      "verdict": "UNCERTAIN",
+      "case_id": 6
     }
   },
   "ledger": {
-    "total_received_wei": 113000000000000000000,
+    "total_received_wei": 116000000000000000000,
     "total_paid_out_wei": 10000000000000000000,
-    "funding_pool_wei": 103000000000000000000,
+    "funding_pool_wei": 106000000000000000000,
     "challenge_reserved_wei": 0,
     "open_stakes_wei": 0,
     "reward_credits_wei": 0,
-    "contract_balance_wei": 103000000000000000000,
-    "accounted_wei": 103000000000000000000,
+    "contract_balance_wei": 106000000000000000000,
+    "accounted_wei": 106000000000000000000,
     "stray_wei": 0,
     "invariant_ok": true
   },
   "reconciliation": {
-    "totalReceivedGen": "113",
+    "totalReceivedGen": "116",
     "totalPaidOutGen": "10",
-    "fundingPoolGen": "103",
+    "fundingPoolGen": "106",
     "challengeReservedGen": "0",
     "openStakesGen": "0",
     "rewardCreditsGen": "0",
-    "contractBalanceGen": "103",
+    "contractBalanceGen": "106",
     "hunterWithdrawnGen": "10",
     "challengerWithdrawnGen": "0",
     "invariantOk": true
   },
   "fundingPool": {
-    "funding_pool_wei": 103000000000000000000,
+    "funding_pool_wei": 106000000000000000000,
     "hunter_reward_wei": 5000000000000000000,
     "challenge_stake_wei": 3000000000000000000,
     "challenge_success_reward_wei": 2000000000000000000
@@ -600,7 +668,7 @@
       "total_rewards_wei": 0
     }
   ],
-  "caseCount": 6,
+  "caseCount": 7,
   "rewardClaimedCase0": true,
   "borderlineAttempts": [
     {
@@ -702,6 +770,36 @@
           "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
         }
       ]
+    },
+    {
+      "caseId": 6,
+      "file": "case-borderline-human-evidence.json",
+      "firstVerdict": "UNCERTAIN",
+      "firstSignals": [
+        "LONG_HISTORY"
+      ],
+      "secondVerdict": "UNCERTAIN",
+      "secondSignals": [
+        "LONG_HISTORY"
+      ],
+      "flipped": false,
+      "witnesses": [
+        {
+          "witness_id": "wit-6-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0xca18ecd7bc37778ce5303a1e8d3ca776401c57d8",
+          "claimed_verdict": "HUMAN",
+          "claimed_signals": [
+            "DIVERSE_COUNTERPARTIES",
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "UNCERTAIN",
+          "second_verdict": "UNCERTAIN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
     }
   ],
   "successChallengeOnChain": null,
@@ -719,5 +817,29 @@
     "challengerAfterWithdrawPlus8sWei": "87000000000000000000",
     "funderFinalWei": "9900000000000000000000"
   },
-  "checkedAt": "2026-11-09T11:36:36.522Z"
+  "checkedAt": "2026-11-09T11:36:36.522Z",
+  "flipAttempt6": {
+    "hunter": "0xD9149ACfFa18CE935Db0A4246cB4b4069058DFCd",
+    "challenger": "0xCa18ECD7bC37778CE5303A1E8D3ca776401c57d8",
+    "hunterStats": {
+      "hunter": "0xd9149acffa18ce935db0a4246cb4b4069058dfcd",
+      "cases_submitted": 1,
+      "sybil_finalized": 0,
+      "rewards_earned_wei": 0,
+      "challenges_won": 0,
+      "challenges_lost": 0,
+      "challenge_rewards_earned_wei": 0
+    },
+    "challengerStats": {
+      "hunter": "0xca18ecd7bc37778ce5303a1e8d3ca776401c57d8",
+      "cases_submitted": 0,
+      "sybil_finalized": 0,
+      "rewards_earned_wei": 0,
+      "challenges_won": 0,
+      "challenges_lost": 1,
+      "challenge_rewards_earned_wei": 0
+    },
+    "note": "Sixth flip attempt, run separately after the main flow: human-side borderline (1 strong + 1 ambiguous human signal). Second evaluation agreed with the first; challenge failed, 3 GEN forfeited to the pool. No CONTRADICTION witness exists on-chain for any case."
+  },
+  "checkedAtCase6": "2026-11-09T11:45:55.373Z"
 }
