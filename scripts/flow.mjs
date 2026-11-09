@@ -455,7 +455,7 @@ const lines = [
   "Explorer: https://explorer-studio.genlayer.com/address/" + address,
   "Checked at: " + evidence.checkedAt,
   "",
-  "Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it used a simulated ledger with no real GEN movement. Two interim deployments of this version are also superseded: `0x2CaF1BC4Ecf1d47853695a5734d4955042Bdf918` (aborted run: a flow-script bug in the challenge claim, hunter key lost with the aborted process) and `0xdc343813A233A43C2Db47Ee9df848e6a583C09CE` (ledger invariant broken by 1 GEN of stray from a rejected payable call, before sweep_stray_gen existed; its 105 GEN of faucet GEN stays locked there). This deployment replaces them.",
+  "Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it used a simulated ledger with no real GEN movement. Three interim deployments of this version are also superseded: `0x2CaF1BC4Ecf1d47853695a5734d4955042Bdf918` (aborted run: a flow-script bug in the challenge claim, hunter key lost with the aborted process), `0xdc343813A233A43C2Db47Ee9df848e6a583C09CE` (ledger invariant broken by 1 GEN of stray from a rejected payable call, before sweep_stray_gen existed; its 105 GEN of faucet GEN stays locked there), and `0x3acFa1C7Ec773e5026b0E0f9ec58cB6754f53F34` (aborted run: the VM restarted mid-flow after funding + 3 submits + 1 evaluation; its 100 GEN of faucet GEN stays locked there). This deployment replaces them.",
   "",
   "## Transactions (all FINALIZED)",
   "",
