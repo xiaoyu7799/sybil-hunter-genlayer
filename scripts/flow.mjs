@@ -15,11 +15,12 @@
  * Flow:
  *   reject probes (deposit 0, bad target, no-credit withdraw, own-case
  *   evaluate, finalize with open challenge, wrong challenge stake,
- *   double reward claim) -> 3 main cases (sybil / human / thin) with a
- *   failed challenge on case 0 -> up to 2 borderline cases attempting the
- *   successful-challenge path (second verdict differs -> CONTRADICTION
- *   witness, challenger credited 3 GEN refund + 2 GEN reward) ->
- *   withdrawals -> full read-back + ledger reconciliation.
+ *   double reward claim) -> sweep the 1 GEN stray left by the wrong-stake
+ *   probe into the funding pool -> 3 main cases (sybil / human / thin)
+ *   with a failed challenge on case 0 -> up to 3 borderline cases
+ *   attempting the successful-challenge path (second verdict differs ->
+ *   CONTRADICTION witness, challenger credited 3 GEN refund + 2 GEN
+ *   reward) -> withdrawals -> full read-back + ledger reconciliation.
  * Writes evidence.json (tx hashes, FINALIZED status, read-back values)
  * and docs/live-verification.md.
  *
@@ -51,6 +52,7 @@ const TARGET_HUMAN = "0x2222222222222222222222222222222222222222";
 const TARGET_THIN = "0x3333333333333333333333333333333333333333";
 const TARGET_BORDER_A = "0x4444444444444444444444444444444444444444";
 const TARGET_BORDER_B = "0x5555555555555555555555555555555555555555";
+const TARGET_BORDER_C = "0x6666666666666666666666666666666666666666";
 
 const funder = createAccount(generatePrivateKey());
 const hunter = createAccount(generatePrivateKey());
@@ -219,6 +221,22 @@ await expectReject(clientB, "challenge_case", [0n, "LONG_HISTORY,DIVERSE_COUNTER
   "reject: challenge_case with 1 GEN stake (must be 3 GEN)",
   async () => await read(clientB, "get_case", [0n]));
 
+// --- 7b. Sweep the stray GEN left by the rejected 1 GEN probe. A rejected
+//     payable call keeps its value in the contract balance without
+//     accounting for it; sweep_stray_gen moves it into the funding pool.
+const ledgerBeforeSweep = await read(clientB, "get_ledger", []);
+console.log("Ledger before sweep:", JSON.stringify(ledgerBeforeSweep));
+let sweptWei = "0";
+if (BigInt(ledgerBeforeSweep.stray_wei) > 0n) {
+  await write(clientB, "sweep_stray_gen", [], "sweep_stray_gen (stray from wrong-stake probe)");
+  const ledgerAfterSweep = await read(clientB, "get_ledger", []);
+  console.log("Ledger after sweep:", JSON.stringify(ledgerAfterSweep));
+  sweptWei = ledgerBeforeSweep.stray_wei;
+  if (!ledgerAfterSweep.invariant_ok) throw new Error("invariant still broken after sweep");
+} else {
+  console.log("No stray GEN to sweep (recorded honestly).");
+}
+
 // --- 8. Case 0: second evaluation finalizes directly.
 await writeWithRetry(clientB, "evaluate_case", [0n], "evaluate_case 0 (second, finalizes)");
 const case0final = await read(clientB, "get_case", [0n]);
@@ -263,12 +281,13 @@ if (case2final.final_verdict === "SYBIL") {
 // --- 12. Borderline cases: attempt the successful-challenge path.
 //     Each borderline file states 2 sybil signals strongly and a third
 //     (SAME_FUNDER) ambiguously, so the two evaluations can honestly
-//     disagree. Try A, then B if A does not flip.
+//     disagree. Try A, then B, then C if the earlier ones do not flip.
 const borderlineAttempts = [];
 let successChallenge = null;
 const borderlineFiles = [
   { id: 3, target: TARGET_BORDER_A, file: "case-borderline-a-evidence.json", note: "Borderline cluster candidate A: 2 strong signals, funder ambiguous." },
   { id: 4, target: TARGET_BORDER_B, file: "case-borderline-b-evidence.json", note: "Borderline cluster candidate B: 2 strong signals, funder ambiguous." },
+  { id: 5, target: TARGET_BORDER_C, file: "case-borderline-c-evidence.json", note: "Borderline cluster candidate C: 2 strong signals, funder stated then contradicted by a second record." },
 ];
 for (const b of borderlineFiles) {
   const doc = JSON.parse(readFileSync(path.join(root, "evidence", b.file), "utf-8"));
@@ -299,7 +318,7 @@ for (const b of borderlineFiles) {
     await write(clientB, "close_case", [BigInt(b.id)], `close_case ${b.id} (no reward)`);
   }
 }
-console.log("Successful challenge on-chain:", successChallenge ? `yes, case ${successChallenge.caseId}` : "NO — both borderline attempts failed to flip");
+console.log("Successful challenge on-chain:", successChallenge ? `yes, case ${successChallenge.caseId}` : "NO — all three borderline attempts failed to flip");
 
 // --- 13. Withdrawals (pull payment) + EOA balance checks.
 eoaBalances.hunterBeforeWithdrawWei = await eoaBalance(clientA, hunter.address);
@@ -344,6 +363,7 @@ const weights = {
   thin: await read(clientA, "get_weight", [TARGET_THIN]),
   borderA: await read(clientA, "get_weight", [TARGET_BORDER_A]),
   borderB: await read(clientA, "get_weight", [TARGET_BORDER_B]),
+  borderC: await read(clientA, "get_weight", [TARGET_BORDER_C]),
 };
 const ledger = await read(clientA, "get_ledger", []);
 const pool = await read(clientA, "get_funding_pool", []);
@@ -400,8 +420,9 @@ const evidence = {
   hunter: hunter.address,
   challenger: challenger.address,
   freshProbeAccount: fresh.address,
-  targets: { sybil: TARGET_SYBIL, human: TARGET_HUMAN, thin: TARGET_THIN, borderA: TARGET_BORDER_A, borderB: TARGET_BORDER_B },
+  targets: { sybil: TARGET_SYBIL, human: TARGET_HUMAN, thin: TARGET_THIN, borderA: TARGET_BORDER_A, borderB: TARGET_BORDER_B, borderC: TARGET_BORDER_C },
   fundingGen: 100,
+  straySweptWei: sweptWei,
   transactions: txs,
   rejectedCalls: rejects,
   cases: finalCases,
@@ -434,7 +455,7 @@ const lines = [
   "Explorer: https://explorer-studio.genlayer.com/address/" + address,
   "Checked at: " + evidence.checkedAt,
   "",
-  "Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it used a simulated ledger with no real GEN movement. This deployment replaces it.",
+  "Previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded: it used a simulated ledger with no real GEN movement. Two interim deployments of this version are also superseded: `0x2CaF1BC4Ecf1d47853695a5734d4955042Bdf918` (aborted run: a flow-script bug in the challenge claim, hunter key lost with the aborted process) and `0xdc343813A233A43C2Db47Ee9df848e6a583C09CE` (ledger invariant broken by 1 GEN of stray from a rejected payable call, before sweep_stray_gen existed; its 105 GEN of faucet GEN stays locked there). This deployment replaces them.",
   "",
   "## Transactions (all FINALIZED)",
   "",
@@ -457,7 +478,8 @@ const lines = [
   "- Challenger stats: " + JSON.stringify(statsB),
   "- Leaderboard: " + JSON.stringify(leaderboard),
   "- Case count: " + JSON.stringify(count),
-  "- Successful challenge on-chain: " + (successChallenge ? `yes, case ${successChallenge.caseId} (${successChallenge.firstVerdict} -> ${successChallenge.secondVerdict}, CONTRADICTION witness)` : "no — both borderline attempts failed to flip; see evidence.json borderlineAttempts"),
+  "- Successful challenge on-chain: " + (successChallenge ? `yes, case ${successChallenge.caseId} (${successChallenge.firstVerdict} -> ${successChallenge.secondVerdict}, CONTRADICTION witness)` : "no — all three borderline attempts failed to flip; see evidence.json borderlineAttempts"),
+  "- Stray GEN swept into the pool: " + weiToGen(sweptWei) + " GEN (" + sweptWei + " wei)",
   "- Hunter withdrew: " + withdrawA + "; challenger withdrew: " + withdrawB,
   "- EOA balances (wei): " + JSON.stringify(eoaBalances),
   "",

@@ -25,8 +25,9 @@ Fastest way to recheck this contract (about 10 minutes):
      expect 0, 1000000, 500000.
    - `get_ledger` — expect `invariant_ok` true and the funding pool,
      credits and paid-out totals to reconcile with `evidence.json`.
+     `stray_wei` should be 0 after the sweep in the live run.
    - `get_leaderboard` with limit 10.
 7. Re-run the local mock tests (mock only, not chain evidence):
-   `python3 tests/test_local.py` — 312 checks, including all 256 signal
-   subsets, the SHA-256 test vectors, and the ledger invariant
-   simulation.
+   `python3 tests/test_local.py` — 319 checks, including all 256 signal
+   subsets, the SHA-256 test vectors, and the ledger invariant and
+   stray-sweep simulations.

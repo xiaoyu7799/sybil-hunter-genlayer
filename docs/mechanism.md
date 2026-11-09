@@ -154,6 +154,18 @@ for all of them.
   challenge stakes); `total_paid_out` counts every GEN that left via
   `withdraw_reward`. The live run reconciles this in `evidence.json`.
 
+- **Stray GEN.** A payable call the contract rejects (a challenge with
+  the wrong stake amount, for example) still leaves its attached GEN in
+  the contract balance: the state change rolls back, but the value
+  transfer does not. That GEN is unaccounted until it is swept. Anyone
+  may call `sweep_stray_gen`, which moves exactly the unaccounted
+  balance (`stray_wei` in `get_ledger`: contract balance minus
+  accounted) into the funding pool and adds the same amount to
+  `total_received`, so the invariant holds again. No accounted GEN can
+  ever be swept, and `sweep_stray_gen` raises when there is no stray
+  GEN. The live run exercises this: the wrong-stake reject probe sends
+  1 GEN, the sweep recovers it into the pool.
+
 - Hunter evolution is tracked per address as `cases_submitted`,
   `sybil_finalized`, `rewards_earned_wei`, plus `challenges_won`,
   `challenges_lost` and `challenge_rewards_earned_wei`. The leaderboard

@@ -53,6 +53,13 @@
 #      total_received == total_paid_out + funding_pool + challenge_reserved
 #                         + open_stakes + reward_credits
 #    and the contract balance equals total_received - total_paid_out.
+#    One exception is handled explicitly: a payable call the contract
+#    rejects (a wrong challenge stake, for example) still leaves its
+#    attached GEN in the contract balance, because the state change rolls
+#    back but the value transfer does not. That unaccounted GEN is
+#    visible as stray_wei in get_ledger and is swept into the funding
+#    pool by sweep_stray_gen, which adjusts total_received by the same
+#    amount so the invariant holds again.
 # 7. Case lifecycle: OPEN -> EVIDENCE_REVIEW -> VERDICT_SYBIL /
 #    VERDICT_HUMAN / VERDICT_UNCERTAIN -> REWARD_PAID / CLOSED_NO_REWARD.
 #    Hunter evolution is tracked as cases_submitted / sybil_finalized /
@@ -590,6 +597,34 @@ class SybilHunter(gl.Contract):
             "total_paid_out_wei": int(state["total_paid_out_wei"]),
         })
 
+    @gl.public.write
+    def sweep_stray_gen(self) -> str:
+        # A payable call that the contract rejects (wrong challenge stake,
+        # for example) still leaves its attached GEN in the contract
+        # balance: the state change rolls back, but the value transfer
+        # does not. That GEN is unaccounted until it is swept. Anyone may
+        # sweep it: the unaccounted balance is moved into the funding pool
+        # and total_received is adjusted by the same amount, so the ledger
+        # invariant holds again. No accounted GEN can ever be swept: the
+        # swept amount is exactly balance minus accounted, and it is zero
+        # when every inflow was accounted.
+        state = self._load()
+        accounted = int(state["total_received_wei"]) - int(state["total_paid_out_wei"])
+        stray = int(self.balance) - accounted
+        if stray < 0:
+            raise Exception("NEGATIVE_STRAY_UNEXPECTED")
+        if stray == 0:
+            raise Exception("NO_STRAY_GEN")
+        state["total_received_wei"] = int(state["total_received_wei"]) + stray
+        state["funding_pool_wei"] = int(state["funding_pool_wei"]) + stray
+        self._save(state)
+        return json.dumps({
+            "swept_wei": stray,
+            "swept_gen": stray // GEN_WEI,
+            "funding_pool_wei": int(state["funding_pool_wei"]),
+            "total_received_wei": int(state["total_received_wei"]),
+        })
+
     # -- views --------------------------------------------------------------
 
     @gl.public.view
@@ -680,6 +715,7 @@ class SybilHunter(gl.Contract):
         funding_pool = int(state["funding_pool_wei"])
         contract_balance = int(self.balance)
         accounted = total_received - total_paid_out
+        stray = contract_balance - accounted
         invariant = (
             total_received == total_paid_out + funding_pool + reserved_total + stakes_total + credits_total
             and contract_balance == accounted
@@ -693,6 +729,7 @@ class SybilHunter(gl.Contract):
             "reward_credits_wei": credits_total,
             "contract_balance_wei": contract_balance,
             "accounted_wei": accounted,
+            "stray_wei": stray,
             "invariant_ok": invariant,
         })
 

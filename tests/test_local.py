@@ -271,7 +271,8 @@ for fname, expected in [("case-sybil-evidence.json", "SYBIL"),
 #     alone give UNCERTAIN, adding the ambiguous SAME_FUNDER gives SYBIL,
 #     so the two evaluations can honestly disagree and a challenge can
 #     succeed on either side.
-for fname in ["case-borderline-a-evidence.json", "case-borderline-b-evidence.json"]:
+for fname in ["case-borderline-a-evidence.json", "case-borderline-b-evidence.json",
+              "case-borderline-c-evidence.json"]:
     doc = json.loads((ROOT / "evidence" / fname).read_text())
     strong = sorted(doc["signals_stated_strong"])
     check("%s strong signals alone -> UNCERTAIN" % fname,
@@ -281,5 +282,31 @@ for fname in ["case-borderline-a-evidence.json", "case-borderline-b-evidence.jso
           verdict_for(with_ambig) == "SYBIL")
     check("%s ambiguous code is a real signal code" % fname,
           all(c in ALL for c in doc["signals_ambiguous"]))
+
+# 14. Stray GEN and sweep, replicating the contract's rule: a rejected
+#     payable call leaves its value in the contract balance without
+#     touching total_received, so balance exceeds accounted by exactly
+#     that value; sweeping moves it into the pool and total_received,
+#     restoring the invariant.
+ledger2 = {"received": 100 * GEN, "paid": 0, "pool": 100 * GEN, "balance": 100 * GEN}
+
+
+def inv2(lbl):
+    check("invariant holds: " + lbl,
+          ledger2["received"] == ledger2["paid"] + ledger2["pool"]
+          and ledger2["balance"] == ledger2["received"] - ledger2["paid"])
+
+
+# A 1 GEN challenge with the wrong stake is rejected, but the 1 GEN stays.
+ledger2["balance"] += 1 * GEN
+stray = ledger2["balance"] - (ledger2["received"] - ledger2["paid"])
+check("stray is exactly 1 GEN after a rejected 1 GEN payable call", stray == 1 * GEN)
+check("invariant broken before sweep (balance != accounted)",
+      ledger2["balance"] != ledger2["received"] - ledger2["paid"])
+# Sweep: pool += stray, received += stray.
+ledger2["pool"] += stray
+ledger2["received"] += stray
+inv2("after sweeping 1 GEN stray into the pool")
+check("pool is 101 GEN after the sweep", ledger2["pool"] == 101 * GEN)
 
 print("\n%d mock checks passed (LOCAL MOCK ONLY — not on-chain evidence)." % passed)
