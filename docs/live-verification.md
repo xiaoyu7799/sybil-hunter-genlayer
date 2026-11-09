@@ -103,3 +103,5 @@ All eight challenge txs FINALIZED. Each attempt used fresh temporary hunter/chal
 ## Why the flip route is closed
 
 A challenge submits no new evidence, and the second evaluation re-fetches the same evidence URL with the same prompt. Across 14 attempts and 28 evaluation rounds, both rounds returned the same signal set every time: numeric thresholds (9 tx/55 min, 6 weeks, 8 months, 11 counterparties) counted in both rounds; definitional disputes (ENS as verified identity, exchange hot wallet as same funder, varied amounts alongside a cloned sequence, 11/12 matching transactions) resolved identically in both rounds; mixed signals (cloned sequence plus varied amounts) counted together in both rounds. The judge is deterministic for explicitly stated facts, so a flip would require sampling variance that did not appear in any round. This is a property of the mechanism, not a matter of trying too few cases.
+
+A new Intelligent Contract was built to fill this Intelligent Contract slot; this repository is preserved as-is and the successful-challenge branch of this contract remains unexercised on-chain.

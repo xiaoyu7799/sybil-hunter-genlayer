@@ -1732,6 +1732,7 @@
     "totalEvaluationRounds": 28,
     "consensusDisagreements": 0,
     "conclusion": "The successful-challenge branch (CONTRADICTION witness, challenger stake refund plus reward) was never exercised on-chain. A challenge submits no new evidence and the second evaluation re-reads the same evidence file with the same prompt, so both rounds return the same signal set for every explicitly stated fact: numeric thresholds (9 tx/55 min, 6 weeks, 8 months, 11 counterparties) counted in both rounds, definitional disputes (ENS as verified identity, exchange hot wallet as same funder, varied amounts alongside a cloned sequence, 11/12 matching transactions) resolved identically in both rounds. No sampling variance appeared in 28 evaluation rounds. This route is systematically closed, not under-tried.",
-    "note": "Each flip attempt used fresh temporary hunter/challenger accounts; no keys were written to disk. All 8 cases are closed; no open stakes, reserves or credits remain."
+    "note": "Each flip attempt used fresh temporary hunter/challenger accounts; no keys were written to disk. All 8 cases are closed; no open stakes, reserves or credits remain.",
+    "replacedBy": "A new Intelligent Contract was built to fill this Intelligent Contract slot; this repository is preserved as-is and the successful-challenge branch of this contract remains unexercised on-chain."
   }
 }
