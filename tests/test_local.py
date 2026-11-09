@@ -157,7 +157,7 @@ check("weight HUMAN == 1000000", weight_for("HUMAN") == 1000000)
 seen_weights = {weight_for(verdict_for(sorted(s))) for s in subsets}
 check("only 3 weights exist across all 256 subsets", seen_weights == {0, 500000, 1000000})
 
-# 6. Worst-case spread proof, simulated: a validator accepts a leader set
+# 6. Worst-case spread proof, modeled: a validator accepts a leader set
 #    only if it equals the validator's own set exactly. Hence any two
 #    accepted leader sets L, L' satisfy L == V and L' == V, so L == L',
 #    so their verdicts and weights are identical. Spread = 0.
@@ -169,8 +169,8 @@ for s in subsets:
     assert weight_for(verdict_for(accepted[0])) == weight_for(verdict_for(own))
 check("exact-set equivalence: at most 1 acceptable set per round, spread 0", True)
 
-# 7. Signal CSV parsing: dedupe + sort, unknown code rejected.
-check("csv parse sorts+dedupes",
+# 7. Signal CSV parsing: sort + remove duplicates, unknown code rejected.
+check("csv parse sorts and removes duplicates",
       parse_csv("BURST_ACTIVITY,SAME_FUNDER,BURST_ACTIVITY") == ["BURST_ACTIVITY", "SAME_FUNDER"])
 try:
     parse_csv("SAME_FUNDER,NOT_A_SIGNAL")

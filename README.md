@@ -2,7 +2,8 @@
 
 Validators judge address-behaviour evidence and score airdrop sybil risk on chain: `SYBIL` / `HUMAN` / `UNCERTAIN` decide the airdrop weight (0 / 1 / 0.5). A confirmed sybil pays the hunter a fixed 5 GEN reward in real testnet GEN; a challenger stakes 3 GEN and wins it back plus 2 GEN when a second evaluation overturns the first verdict.
 
-- Contract: see [`deployment.json`](deployment.json) (previous contract `0xAA9667d41895928f7DE2AACC2fd0F1764f6c6EE4` is superseded — it used a simulated ledger with no real GEN movement)
+- Contract: `0x568b113a7553D8b2D62D26779F7a7cb0a725F376`
+- Explorer: `https://explorer-studio.genlayer.com/address/0x568b113a7553D8b2D62D26779F7a7cb0a725F376`
 - Network: Stable Studionet, chain 61999, RPC `https://studio.genlayer.com/api`
 
 ## How it works
