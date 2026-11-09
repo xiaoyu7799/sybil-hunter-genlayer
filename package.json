@@ -1,0 +1,14 @@
+{
+  "name": "sybil-hunter-genlayer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "node scripts/deploy.mjs",
+    "flow": "node scripts/flow.mjs",
+    "test:local": "python3 tests/test_local.py"
+  },
+  "dependencies": {
+    "genlayer-js": "1.1.8"
+  }
+}
