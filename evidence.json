@@ -15,7 +15,15 @@
     "borderA": "0x4444444444444444444444444444444444444444",
     "borderB": "0x5555555555555555555555555555555555555555",
     "borderC": "0x6666666666666666666666666666666666666666",
-    "borderHuman": "0x7777777777777777777777777777777777777777"
+    "borderHuman": "0x7777777777777777777777777777777777777777",
+    "flip1": "0x8888888888888888888888888888888888888888",
+    "flip2": "0x9999999999999999999999999999999999999999",
+    "flip3": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "flip4": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+    "flip5": "0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+    "flip6": "0xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "flip7": "0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "flip8": "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
   },
   "fundingGen": 100,
   "straySweptWei": 1000000000000000000,
@@ -198,6 +206,226 @@
     {
       "label": "close_case 6 (no reward)",
       "txHash": "0xfc0a20c1ed169c9a94a2d3d149ec01fcf8c6df12a9b21abd6d1afcc39e7c4126",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 7",
+      "txHash": "0x531fb6b567588d63e6929918ef21bb06632a767c3c4e7d6670dac96d0061ebd1",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 7 (first) (try 1)",
+      "txHash": "0xafb3a9f49e9a5c4ee5b5962152439f218b309186ff44c76263a9e8cae4d6f87a",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 7 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0xf192b74f705d41be22a3115ab768b491ab3e15898fea65e760fe7e628f74f071",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 7 (second, finalizes) (try 1)",
+      "txHash": "0x93062912a6782362035d4f65b76f228f4ff1907a982fae4e5ea3603baadcf5d4",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "claim_case_reward 7 (5 GEN credit)",
+      "txHash": "0x2c1f587c1df859a328de18d9708f7cd3daf7411c050e37420d58dd02d150df7d",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "withdraw_reward (hunter)",
+      "txHash": "0xdaff4d1ed386e3680e3a51884a9717617c9a19731d49c16653e0d39ac038291d",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 8",
+      "txHash": "0x87e45abe8fef4dc9fc136b580af34664d09737f4a1cd66d5b0f4f1592e767b6f",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 8 (first) (try 1)",
+      "txHash": "0x55228cd4a2a078c0f327bff06075a6fa5e499704caefbd3d21518f42579a6f68",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 8 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0x478fc2f0ae99b4c12da0442a8cf43776bca275bcfb87c0c11949605a5e9a1c78",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 8 (second, finalizes) (try 1)",
+      "txHash": "0x122dfa0281681ea44e34282db906290e907cfe046a8e7fa0f5ba0522e5148e6b",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "claim_case_reward 8 (5 GEN credit)",
+      "txHash": "0xc5caea66df45113a08dae5b8f80d93d06a846c54a819870d7b0181c132120ad4",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "withdraw_reward (hunter)",
+      "txHash": "0xe9993a03baae3a509d048e1e22f79b0827bb5701997a6079b37f43c96ab97395",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 9",
+      "txHash": "0xb1eaf33d7fe7d11ce05c1cb514102299ac29fb2c526e27412c1d63e467890bae",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 9 (first) (try 1)",
+      "txHash": "0x377732ced945dce1b4be14c65d6a01770d2d059490df17b30433c3799f67cafc",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 9 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0xd07c6af544daa37d8ad701da5a9a9fa0fcf9f01f0ef1f7337c04244226afe2a2",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 9 (second, finalizes) (try 1)",
+      "txHash": "0x252c0d1c572e9e7d61f2ec2c0915fd8de89d7464a47273b22c8c8782689c7323",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "close_case 9 (no reward)",
+      "txHash": "0xd4026a6ad41f0c1f8e1109be95bebda10d04d9c2048e9a789df5642089217354",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 10",
+      "txHash": "0xa0dcb6ce8768352e4741619351d6fe948d882e3f92236674bd22b3207732d40d",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 10 (first) (try 1)",
+      "txHash": "0x1aa07e5f7aa7f2ce4993e1d078d300681823933faf8c18ae2bac311e0329941c",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 10 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0x5e21e031aa0e9d75009363924ea6290f6956d7b7312ad50cba2762c4d4a5cc81",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 10 (second, finalizes) (try 1)",
+      "txHash": "0x40379be462bd7260294276c58e1d9c670bfae3458c088fe6eb9d9f26b7afde35",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "close_case 10 (no reward)",
+      "txHash": "0x20bdb7cee7b9467fc6fc581c7062080948a13d68669d4312718cdee15ae3fa62",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 11",
+      "txHash": "0xdc47ea1679d25d753e82965cdb40a7a88e3b1fee9b11cf12806568a548215eb3",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 11 (first) (try 1)",
+      "txHash": "0x18636f66225809b0929c27a24adbeaebf60157ee542a3e252779f11c7d7d5164",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 11 (claim SYBIL, 3 GEN)",
+      "txHash": "0x3b8a1f05bfac3990a8957847871161559196e3c2872cca8cdf40f06ef6446074",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 11 (second, finalizes) (try 1)",
+      "txHash": "0x946411a5571eda703a848e0394d7c243749aefd0bec7306f2f30b1f19f3c0054",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "close_case 11 (no reward)",
+      "txHash": "0x6c45988121b9037d5f7d1cd3b73e45e8cbcfcdc75da18f243789ff12cce0daee",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 12",
+      "txHash": "0xec2df239c64494312b550b551d34d799fd88f3edfdb7b5b7dc434732b5e35688",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 12 (first) (try 1)",
+      "txHash": "0x305b1f5faec8c53d482c12d05d0efc9e6cc8cc61554f9d048c5938576b166a65",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 12 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0x15181377f519f28b6b08737bc15af9315b34f803f1ff23fd9b114a39288cf40f",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 12 (second, finalizes) (try 1)",
+      "txHash": "0x020e95072a747c801bafb834a82993efc78ca93da348d053a1d8f4b9fa5a9443",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "close_case 12 (no reward)",
+      "txHash": "0x914aaf75ebc7a7e9dd840d4231bbd4999c8f52e0bd7a5cbdf31de1747c2d0545",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 13",
+      "txHash": "0xfd43d372b71c2cb2a03f87fe68ab8512f2161ff77d06823ab15c622171ef91ed",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 13 (first) (try 1)",
+      "txHash": "0xb99a6766ef11158f0048d4f59a75c7c8e203bdd640608112d84657170840352f",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 13 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0x7eb5ce3a66dcfd0c551ca1e7b43f2ea5bccfeabbc6ba0e0fb0b9b5b2efc38a07",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 13 (second, finalizes) (try 1)",
+      "txHash": "0x33d6510ba6fe1c5c9ff73ee342d8e9b0a5fd4356683aff5bd1f409ee85a64d1c",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "claim_case_reward 13 (5 GEN credit)",
+      "txHash": "0x59ff9c4d776cda4391b2a314b6660a0ec2384f988db19ff5838cf3d24ed5c4a6",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "withdraw_reward (hunter)",
+      "txHash": "0x9e6bf23c2a66edd28835099853f5ee169f5963f6b726c3f7da2093e25609888d",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "submit_case 14",
+      "txHash": "0x3b211a5fd5dbefb22a9c31ec5985bd024119619e2e5c1d6de5f0db022bbbadee",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 14 (first) (try 1)",
+      "txHash": "0x3c47604a625b03ed5c1eb479a10c074a4f1e2e343e5d13b18df3f7abcac07e25",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "challenge_case 14 (claim UNCERTAIN, 3 GEN)",
+      "txHash": "0x0ee1b04bba3f317bfb54d31f0c04538b4331723eb75e0e7bacb25d6981114e4b",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "evaluate_case 14 (second, finalizes) (try 1)",
+      "txHash": "0x10cc048c64b6cd0470f53446e4b7025a3db13a32b021a0a6954dfd53984227f3",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "claim_case_reward 14 (5 GEN credit)",
+      "txHash": "0x8e2f41ed62feae4a7138a7505d59026ccadaeabd6929ce5daddf01c73781c259",
+      "status": "FINALIZED"
+    },
+    {
+      "label": "withdraw_reward (hunter)",
+      "txHash": "0xda844393a94154ae5482d47a1a69dc5c3441a59f7e113441ee35498aa507088e",
       "status": "FINALIZED"
     }
   ],
@@ -551,6 +779,328 @@
           "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
         }
       ]
+    },
+    "case7": {
+      "case_id": 7,
+      "target_address": "0x8888888888888888888888888888888888888888",
+      "hunter": "0xdb95d1b863836dbd852d17d97677392d1ea9fd21",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-1-evidence.json",
+      "evidence_note": "Flip attempt F1: BURST count threshold, 9 tx in 55 min; clear SAME_FUNDER + IDENTICAL.",
+      "status": "REWARD_PAID",
+      "pending_verdict": "SYBIL",
+      "pending_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "SYBIL",
+      "final_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "final_weight_scaled": 0,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-7-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x1f44d28554f4ef561cea33dedc2a810e0a9c88c5",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case8": {
+      "case_id": 8,
+      "target_address": "0x9999999999999999999999999999999999999999",
+      "hunter": "0x61a0b39bcf5d10c9a356fcf50ae6ce5486c27b60",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-2-evidence.json",
+      "evidence_note": "Flip attempt F2: FRESH age threshold, first tx 6 weeks ago; clear SAME_FUNDER + IDENTICAL.",
+      "status": "REWARD_PAID",
+      "pending_verdict": "SYBIL",
+      "pending_signals": [
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "SYBIL",
+      "final_signals": [
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "final_weight_scaled": 0,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-8-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x6d4a15bc4a309a31c3a545b0390b696c3ea52e68",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "IDENTICAL_TX_PATTERN",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case9": {
+      "case_id": 9,
+      "target_address": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "hunter": "0xe74e9737ea71b75515990ccc6efd3701025f7c57",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-3-evidence.json",
+      "evidence_note": "Flip attempt F3: LONG_HISTORY age threshold, first tx 8 months ago; clear DIVERSE, 186 counterparties.",
+      "status": "CLOSED_NO_REWARD",
+      "pending_verdict": "HUMAN",
+      "pending_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "HUMAN",
+      "final_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "final_weight_scaled": 1000000,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-9-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x069cb6bd3ed7466b6b1da4dae3d3b4e358f4cbb4",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "DIVERSE_COUNTERPARTIES"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case10": {
+      "case_id": 10,
+      "target_address": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+      "hunter": "0x48ae1a718ae924fb71b09587ec540d61a3005e8d",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-4-evidence.json",
+      "evidence_note": "Flip attempt F4: DIVERSE count threshold, 11 distinct counterparties; clear LONG_HISTORY since March 2023.",
+      "status": "CLOSED_NO_REWARD",
+      "pending_verdict": "HUMAN",
+      "pending_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "HUMAN",
+      "final_signals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "final_weight_scaled": 1000000,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-10-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x3869260ee9da280d1b21a11f377a462b05705661",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case11": {
+      "case_id": 11,
+      "target_address": "0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+      "hunter": "0x49382c7ca252bae1224494fb8f52392d49c1097b",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-5-evidence.json",
+      "evidence_note": "Flip attempt F5: UNIQUE_BEHAVIOUR intrusion, 3 clear sybil signals plus amounts varied 0.8-1.4 ETH across 3 contracts.",
+      "status": "CLOSED_NO_REWARD",
+      "pending_verdict": "UNCERTAIN",
+      "pending_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "UNCERTAIN",
+      "final_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "final_weight_scaled": 500000,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-11-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x809cb30266c5b4096e1e449668fbbef75d54b998",
+          "claimed_verdict": "SYBIL",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "UNCERTAIN",
+          "second_verdict": "UNCERTAIN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case12": {
+      "case_id": 12,
+      "target_address": "0xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "hunter": "0x2d59c6222fed03e9485e66776e8253453589f958",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-6-evidence.json",
+      "evidence_note": "Flip attempt F6: VERIFIED_ACTIVITY via ENS marisol-trades.eth; clear LONG_HISTORY since March 2023.",
+      "status": "CLOSED_NO_REWARD",
+      "pending_verdict": "HUMAN",
+      "pending_signals": [
+        "LONG_HISTORY",
+        "VERIFIED_ACTIVITY"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "HUMAN",
+      "final_signals": [
+        "LONG_HISTORY",
+        "VERIFIED_ACTIVITY"
+      ],
+      "final_weight_scaled": 1000000,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-12-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x403041c8f315fea5d0e50c70761e5329eb1165b3",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case13": {
+      "case_id": 13,
+      "target_address": "0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+      "hunter": "0x11d36414252c0651b8284414c2d1f223b1e899d1",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-7-evidence.json",
+      "evidence_note": "Flip attempt F7: SAME_FUNDER scope, funded by exchange hot wallet shared with 12,000+ addresses; clear IDENTICAL + BURST 44 tx/80 min.",
+      "status": "REWARD_PAID",
+      "pending_verdict": "SYBIL",
+      "pending_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "SYBIL",
+      "final_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "final_weight_scaled": 0,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-13-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x2554cf3c16a05a9bc58895b110e0dc8498c8e31f",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    "case14": {
+      "case_id": 14,
+      "target_address": "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+      "hunter": "0x36b54655d52c245cfb90639ddc5ad8ad94e26a40",
+      "evidence_url": "https://raw.githubusercontent.com/xiaoyu7799/sybil-hunter-genlayer/main/evidence/case-flip-8-evidence.json",
+      "evidence_note": "Flip attempt F8: IDENTICAL similarity boundary, 11 of 12 tx match, 1 differs by 2%; clear SAME_FUNDER + BURST 41 tx/75 min.",
+      "status": "REWARD_PAID",
+      "pending_verdict": "SYBIL",
+      "pending_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "pending_round": 2,
+      "evaluations": 2,
+      "final_verdict": "SYBIL",
+      "final_signals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "final_weight_scaled": 0,
+      "challenge": null,
+      "witnesses": [
+        {
+          "witness_id": "wit-14-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0xde0208ec1f3b04ca7a239a2245d95c2c27b2434a",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
     }
   },
   "weights": {
@@ -588,34 +1138,74 @@
       "weight_scaled": 500000,
       "verdict": "UNCERTAIN",
       "case_id": 6
+    },
+    "flip1": {
+      "weight_scaled": 0,
+      "verdict": "SYBIL",
+      "case_id": 7
+    },
+    "flip2": {
+      "weight_scaled": 0,
+      "verdict": "SYBIL",
+      "case_id": 8
+    },
+    "flip3": {
+      "weight_scaled": 1000000,
+      "verdict": "HUMAN",
+      "case_id": 9
+    },
+    "flip4": {
+      "weight_scaled": 1000000,
+      "verdict": "HUMAN",
+      "case_id": 10
+    },
+    "flip5": {
+      "weight_scaled": 500000,
+      "verdict": "UNCERTAIN",
+      "case_id": 11
+    },
+    "flip6": {
+      "weight_scaled": 1000000,
+      "verdict": "HUMAN",
+      "case_id": 12
+    },
+    "flip7": {
+      "weight_scaled": 0,
+      "verdict": "SYBIL",
+      "case_id": 13
+    },
+    "flip8": {
+      "weight_scaled": 0,
+      "verdict": "SYBIL",
+      "case_id": 14
     }
   },
   "ledger": {
-    "total_received_wei": 116000000000000000000,
-    "total_paid_out_wei": 10000000000000000000,
-    "funding_pool_wei": 106000000000000000000,
+    "total_received_wei": 140000000000000000000,
+    "total_paid_out_wei": 30000000000000000000,
+    "funding_pool_wei": 110000000000000000000,
     "challenge_reserved_wei": 0,
     "open_stakes_wei": 0,
     "reward_credits_wei": 0,
-    "contract_balance_wei": 106000000000000000000,
-    "accounted_wei": 106000000000000000000,
+    "contract_balance_wei": 110000000000000000000,
+    "accounted_wei": 110000000000000000000,
     "stray_wei": 0,
     "invariant_ok": true
   },
   "reconciliation": {
-    "totalReceivedGen": "116",
-    "totalPaidOutGen": "10",
-    "fundingPoolGen": "106",
+    "totalReceivedGen": "140",
+    "totalPaidOutGen": "30",
+    "fundingPoolGen": "110",
     "challengeReservedGen": "0",
     "openStakesGen": "0",
     "rewardCreditsGen": "0",
-    "contractBalanceGen": "106",
-    "hunterWithdrawnGen": "10",
+    "contractBalanceGen": "110",
+    "hunterWithdrawnGen": "30",
     "challengerWithdrawnGen": "0",
     "invariantOk": true
   },
   "fundingPool": {
-    "funding_pool_wei": 106000000000000000000,
+    "funding_pool_wei": 110000000000000000000,
     "hunter_reward_wei": 5000000000000000000,
     "challenge_stake_wei": 3000000000000000000,
     "challenge_success_reward_wei": 2000000000000000000
@@ -668,7 +1258,7 @@
       "total_rewards_wei": 0
     }
   ],
-  "caseCount": 7,
+  "caseCount": 15,
   "rewardClaimedCase0": true,
   "borderlineAttempts": [
     {
@@ -800,6 +1390,288 @@
           "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
         }
       ]
+    },
+    {
+      "caseId": 7,
+      "file": "case-flip-1-evidence.json",
+      "hypothesis": "BURST threshold: 9 tx in 55 min may sit on the judge's boundary; a second run may not count BURST, flipping SYBIL to UNCERTAIN.",
+      "firstVerdict": "SYBIL",
+      "firstSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "secondVerdict": "SYBIL",
+      "secondSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-7-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x1f44d28554f4ef561cea33dedc2a810e0a9c88c5",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 8,
+      "file": "case-flip-2-evidence.json",
+      "hypothesis": "FRESH threshold: first tx 6 weeks ago may sit on the boundary between fresh and established.",
+      "firstVerdict": "SYBIL",
+      "firstSignals": [
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "secondVerdict": "SYBIL",
+      "secondSignals": [
+        "FRESH_NO_HISTORY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-8-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x6d4a15bc4a309a31c3a545b0390b696c3ea52e68",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "IDENTICAL_TX_PATTERN",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 9,
+      "file": "case-flip-3-evidence.json",
+      "hypothesis": "LONG_HISTORY threshold: first tx 8 months ago may sit on the boundary between short and long history.",
+      "firstVerdict": "HUMAN",
+      "firstSignals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "secondVerdict": "HUMAN",
+      "secondSignals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-9-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x069cb6bd3ed7466b6b1da4dae3d3b4e358f4cbb4",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "DIVERSE_COUNTERPARTIES"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 10,
+      "file": "case-flip-4-evidence.json",
+      "hypothesis": "DIVERSE threshold: 11 counterparties may sit on the boundary of diverse.",
+      "firstVerdict": "HUMAN",
+      "firstSignals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "secondVerdict": "HUMAN",
+      "secondSignals": [
+        "DIVERSE_COUNTERPARTIES",
+        "LONG_HISTORY"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-10-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x3869260ee9da280d1b21a11f377a462b05705661",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 11,
+      "file": "case-flip-5-evidence.json",
+      "hypothesis": "Mixed signals: 3 sybil signals plus UNIQUE_BEHAVIOUR (varied amounts) may make the judge drop one side between rounds.",
+      "firstVerdict": "UNCERTAIN",
+      "firstSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "secondVerdict": "UNCERTAIN",
+      "secondSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER",
+        "UNIQUE_BEHAVIOUR"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-11-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x809cb30266c5b4096e1e449668fbbef75d54b998",
+          "claimed_verdict": "SYBIL",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "UNCERTAIN",
+          "second_verdict": "UNCERTAIN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 12,
+      "file": "case-flip-6-evidence.json",
+      "hypothesis": "VERIFIED_ACTIVITY scope: an ENS name is a public identity link but not KYC verification; judges may split on whether it counts.",
+      "firstVerdict": "HUMAN",
+      "firstSignals": [
+        "LONG_HISTORY",
+        "VERIFIED_ACTIVITY"
+      ],
+      "secondVerdict": "HUMAN",
+      "secondSignals": [
+        "LONG_HISTORY",
+        "VERIFIED_ACTIVITY"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-12-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x403041c8f315fea5d0e50c70761e5329eb1165b3",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "LONG_HISTORY"
+          ],
+          "first_verdict": "HUMAN",
+          "second_verdict": "HUMAN",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 13,
+      "file": "case-flip-7-evidence.json",
+      "hypothesis": "SAME_FUNDER scope: a shared exchange hot wallet is the same source factually, but its 12,000+ funded addresses are not siblings; judges may split on scope.",
+      "firstVerdict": "SYBIL",
+      "firstSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "secondVerdict": "SYBIL",
+      "secondSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-13-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0x2554cf3c16a05a9bc58895b110e0dc8498c8e31f",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "IDENTICAL_TX_PATTERN"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
+    },
+    {
+      "caseId": 14,
+      "file": "case-flip-8-evidence.json",
+      "hypothesis": "IDENTICAL similarity boundary: 11 of 12 transactions matching with 1 differing by 2% may be read as the same pattern or not.",
+      "firstVerdict": "SYBIL",
+      "firstSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "secondVerdict": "SYBIL",
+      "secondSignals": [
+        "BURST_ACTIVITY",
+        "IDENTICAL_TX_PATTERN",
+        "SAME_FUNDER"
+      ],
+      "flipped": false,
+      "whyRoundsAgreed": "Both rounds read the same evidence file with the same prompt and returned the same signal set; the judge counts every explicitly stated fact in both rounds, so no sampling variance appeared.",
+      "witnesses": [
+        {
+          "witness_id": "wit-14-r2",
+          "round": 2,
+          "kind": "FAILED_CHALLENGE",
+          "challenger": "0xde0208ec1f3b04ca7a239a2245d95c2c27b2434a",
+          "claimed_verdict": "UNCERTAIN",
+          "claimed_signals": [
+            "BURST_ACTIVITY",
+            "SAME_FUNDER"
+          ],
+          "first_verdict": "SYBIL",
+          "second_verdict": "SYBIL",
+          "stake_forfeited_wei": 3000000000000000000,
+          "note": "Second evaluation agreed with the first verdict; challenge failed; 3 GEN stake forfeited to the funding pool."
+        }
+      ]
     }
   ],
   "successChallengeOnChain": null,
@@ -817,7 +1689,7 @@
     "challengerAfterWithdrawPlus8sWei": "87000000000000000000",
     "funderFinalWei": "9900000000000000000000"
   },
-  "checkedAt": "2026-11-09T11:36:36.522Z",
+  "checkedAt": "2026-11-09T14:07:26.000Z",
   "flipAttempt6": {
     "hunter": "0xD9149ACfFa18CE935Db0A4246cB4b4069058DFCd",
     "challenger": "0xCa18ECD7bC37778CE5303A1E8D3ca776401c57d8",
@@ -841,5 +1713,25 @@
     },
     "note": "Sixth flip attempt, run separately after the main flow: human-side borderline (1 strong + 1 ambiguous human signal). Second evaluation agreed with the first; challenge failed, 3 GEN forfeited to the pool. No CONTRADICTION witness exists on-chain for any case."
   },
-  "checkedAtCase6": "2026-11-09T11:45:55.373Z"
+  "checkedAtCase6": "2026-11-09T11:45:55.373Z",
+  "flipAttemptsNew": {
+    "attempts": 8,
+    "cases": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "flipped": 0,
+    "priorAttempts": 6,
+    "totalAttempts": 14,
+    "totalEvaluationRounds": 28,
+    "consensusDisagreements": 0,
+    "conclusion": "The successful-challenge branch (CONTRADICTION witness, challenger stake refund plus reward) was never exercised on-chain. A challenge submits no new evidence and the second evaluation re-reads the same evidence file with the same prompt, so both rounds return the same signal set for every explicitly stated fact: numeric thresholds (9 tx/55 min, 6 weeks, 8 months, 11 counterparties) counted in both rounds, definitional disputes (ENS as verified identity, exchange hot wallet as same funder, varied amounts alongside a cloned sequence, 11/12 matching transactions) resolved identically in both rounds. No sampling variance appeared in 28 evaluation rounds. This route is systematically closed, not under-tried.",
+    "note": "Each flip attempt used fresh temporary hunter/challenger accounts; no keys were written to disk. All 8 cases are closed; no open stakes, reserves or credits remain."
+  }
 }
